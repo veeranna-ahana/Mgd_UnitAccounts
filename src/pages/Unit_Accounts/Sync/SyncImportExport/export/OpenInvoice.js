@@ -3,6 +3,8 @@ import { Table } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 
 export default function OpenInvoice({ data }) {
+  const [selectRow, setSelectRow] = useState([]);
+
   //console.log(data)
   const itemsPerPage = 200; // Number of items per page
   const [currentPage, setCurrentPage] = useState(0);
@@ -30,13 +32,18 @@ export default function OpenInvoice({ data }) {
 
   function formatAmount(amount) {
     // Assuming amount is a number
-    const formattedAmount = new Intl.NumberFormat('en-IN', {
+    const formattedAmount = new Intl.NumberFormat("en-IN", {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     }).format(amount);
-  
+
     return formattedAmount;
-}
+  }
+
+  const selectedRowFun = (item, index) => {
+    let list = { ...item, index: index };
+    setSelectRow(list);
+  };
 
   return (
     <div>
@@ -57,14 +64,25 @@ export default function OpenInvoice({ data }) {
           </thead>
           <tbody className="tablebody">
             {currentPageData
-              ? currentPageData.map((item) => (
-                  <tr key={item.DC_Inv_No} style={{ whiteSpace: "nowrap" }}>
+              ? currentPageData.map((item, key) => (
+                  <tr
+                    key={item.DC_Inv_No}
+                    style={{ whiteSpace: "nowrap" }}
+                    onClick={() => selectedRowFun(item, key)}
+                    className={
+                      key === selectRow?.index ? "selcted-row-clr" : ""
+                    }
+                  >
                     <td>{item.Inv_No}</td>
                     <td>{formatDate(item.Inv_Date)}</td>
                     <td>{item.DC_InvType}</td>
-                    <td style={{textAlign:'right'}}>{formatAmount(item.GrandTotal)}</td>
+                    <td style={{ textAlign: "right" }}>
+                      {formatAmount(item.GrandTotal)}
+                    </td>
 
-                    <td style={{textAlign:'right'}}>{formatAmount(item.PymtAmtRecd)}</td>
+                    <td style={{ textAlign: "right" }}>
+                      {formatAmount(item.PymtAmtRecd)}
+                    </td>
                     <td>{item.Cust_Name}</td>
                   </tr>
                 ))

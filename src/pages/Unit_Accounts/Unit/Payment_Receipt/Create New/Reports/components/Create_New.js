@@ -568,6 +568,7 @@ function Create_New() {
   }, [doubleClickSignal]);
 
   const handleRowSelect = (data) => {
+    console.log("hiiiiiiiiiiiiiiiiiiiiiii");
     const selectedRow = rvData.firstTableArray.find(
       (row) => row.PVSrlID === data.PVSrlID
     );
@@ -653,6 +654,14 @@ function Create_New() {
     try {
       const { name, value } = e.target;
   
+      // Find the current receipt detail for the specified Inv_No
+      const currentReceiptDetail = rvData.data.receipt_details.find(
+        (row) => row.Inv_No === invNo
+      );
+  
+      // Calculate the difference between the new and old Receive_Now values
+      const receiveNowDifference = parseFloat(value) - parseFloat(currentReceiptDetail.Receive_Now || 0);
+  
       const updatedReceiptDetails = rvData.data.receipt_details.map((row) =>
         row.Inv_No === invNo ? { ...row, [name]: value } : row
       );
@@ -667,8 +676,8 @@ function Create_New() {
   
       console.log("NEWONACCOUNT", newOnAccount);
   
-      // Check if the new value of Receive_Now would exceed newOnAccount
-      if (updatedTotalReceiveNow <= newOnAccount || newOnAccount === 0) {
+      // Check if the difference between the new and old Receive_Now values exceeds newOnAccount
+      if ( newOnAccount >= 0) {
         // Update On_account using the updateOnAccount API
         const updateOnAccountResponse = await axios.post(
           baseURL + "/Payment_Receipts/updateOnAccount",
@@ -679,7 +688,7 @@ function Create_New() {
         );
   
         // Check if the updated On_account would be negative
-        if (updateOnAccountResponse.data.updatedOnAccount[0]?.On_account >= 0) {
+        if (  updateOnAccountResponse.data.updatedOnAccount[0]?.On_account >= 0 ) {
           // Update On_account in rvData.postData with the result from the updateOnAccount API
           setRvData((prevRvData) => ({
             ...prevRvData,
@@ -694,10 +703,12 @@ function Create_New() {
             },
           }));
         }
+
+       
       } 
-      
       else {
-        toast.error("Receive_now value exceeds the Onaccount value");
+        
+        toast.error("Cannot Receive more than Invoice Amount");
       }
     } catch (error) {
       console.error("Error in handleInputChange:", error);
@@ -705,10 +716,18 @@ function Create_New() {
     }
   };
   
-  
 
   const addToVoucher = async () => {
 
+
+    const isAnyEmptyReceiveNow = rvData.firstTableArray.some(
+      (row) => row.Receive_Now === ""
+    );
+
+    if (isAnyEmptyReceiveNow) {
+      toast.error("Receive Now cannot be empty");
+      return;
+    }
 
     try {
       const selectedRows = rvData.secondTableArray;
@@ -847,77 +866,6 @@ function Create_New() {
 
 
 
-  // const removeVoucher = async () => {
-  //   try {
-  //     const isAnyEmptyReceiveNow = rvData.data.receipt_details.some(
-  //       (row) => row.Receive_Now === ""
-  //     );
-
-  //     if (isAnyEmptyReceiveNow) {
-  //       toast.error("Receive Now cannot be empty");
-  //       return;
-  //     }
-
-  //     if (rvData.data.receipt_details.length === 0) {
-  //       toast.error("No rows selected for removal of voucher.");
-  //       return;
-  //     }
-
-  //     const PVSrlID = rvData.data.receipt_details[0].PVSrlID;
-  //     const receiveNowValue = parseFloat(
-  //       rvData.data.receipt_details[0].Receive_Now
-  //     );
-
-  //     console.log("PVSrlID", PVSrlID);
-
-  //     const response = await axios.post(
-  //       baseURL + "/Payment_Receipts/removeVoucher",
-  //       {
-  //         PVSrlID: PVSrlID,
-  //         RecdPVID: rvData.postData.RecdPVID,
-  //       }
-  //     );
-
-  //     // Convert On_account to a number, round it to 2 decimal places, then parse it back to a number
-  //     const roundedOnAccount = parseFloat(
-  //       parseFloat(rvData.postData.On_account).toFixed(2)
-  //     );
-
-  //     // Update receipt_details and On_account after removing voucher
-  //     setRvData((prevRvData) => ({
-  //       ...prevRvData,
-  //       data: {
-  //         ...prevRvData.data,
-  //         receipt_details: response.data,
-  //       },
-  //       postData: {
-  //         ...prevRvData.postData,
-  //         On_account: roundedOnAccount + receiveNowValue,
-  //       },
-  //     }));
-
-  //     // Make API call to update On_account on the backend
-  //     const updateOnAccountResponse = await axios.post(
-  //       baseURL + "/Payment_Receipts/updateOnAccount",
-  //       {
-  //         onAccountValue: roundedOnAccount + receiveNowValue,
-  //         RecdPVID: rvData.postData.RecdPVID,
-  //       }
-  //     );
-
-  //     // Update On_account in rvData.postData with the result from the updateOnAccount API
-  //     setRvData((prevRvData) => ({
-  //       ...prevRvData,
-  //       postData: {
-  //         ...prevRvData.postData,
-  //         On_account:
-  //           updateOnAccountResponse.data.updatedOnAccount[0]?.On_account,
-  //       },
-  //     }));
-  //   } catch (error) {
-  //     console.error("Error removing voucher:", error);
-  //   }
-  // };
 
 
 
@@ -1221,6 +1169,10 @@ window.location.reload();
   const pdfSubmit = (e) => {
 
 
+
+    if(rvData.data.receipt_details.length===0){
+      setPdfVoucher(true);
+    }
     const isAnyEmptyReceiveNow = rvData.firstTableArray.some(
       (row) => row.Receive_Now === ""
     );
@@ -1476,6 +1428,8 @@ window.location.reload();
         </div>
 
         <div className="col-md-6">
+
+          
           <button
             className={
               rvData.postData.ReceiptStatus != "Draft"

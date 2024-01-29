@@ -80,6 +80,15 @@ export default function Tabpage2Table({ selectedDate }) {
     return formattedAmount;
 }
 
+const [selectRow, setSelectRow] = useState("");
+const selectedRowFun = (item, index) => {
+  let list = { ...item, index: index };
+  //  setSelectRow(initial)
+
+  setSelectRow(list);
+  // setState(true);
+};
+
   return (
     <div className='col-md-6' style={{ height: '300px', overflowY: 'scroll', overflowX: 'scroll', }}>
 
@@ -116,8 +125,13 @@ export default function Tabpage2Table({ selectedDate }) {
 
 
                   </tr>
-                  {group.items.map((item, itemIndex) => (
-                    <tr key={itemIndex}>
+                  {group.items.map((item, key) => (
+                    <tr 
+                    
+                    onClick={() => selectedRowFun(item, key)}
+
+                    className={key === selectRow?.index ? 'selcted-row-clr' : ''}
+                    >
                       <td></td>
                       <td></td>
                       <td>{item.Inv_No}</td>

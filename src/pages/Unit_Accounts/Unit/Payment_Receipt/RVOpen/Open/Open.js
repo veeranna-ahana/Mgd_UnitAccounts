@@ -28,6 +28,8 @@ export default function Open() {
   const handlePageChange = ({ selected }) => {
     setCurrentPage(selected);
   };
+
+
   const handleSearch = (event) => {
     console.log(event.target.value)
     const inputValue = event.target.value;
@@ -93,6 +95,26 @@ export default function Open() {
     return formattedAmount;
   }
 
+
+  const [searchCustName,setSearchCustName]=useState([])
+  const searchCustomer=(event)=>{
+ 
+    const inputValue = event.target.value;
+    setSearchCustName(inputValue);
+
+    // Filter the data based on Receipt Status, Receipt Vr No, and Transaction Type if there's a search input, otherwise, use the initial data
+    const filtered = inputValue
+      ? data.filter((rv) =>
+        rv.CustName.toLowerCase().includes(inputValue.toLowerCase())
+        
+      )
+      : data;
+
+    setFilteredData(filtered);
+  }
+
+  
+
   return (
     <div>
       <div className="col-md-12">
@@ -101,13 +123,13 @@ export default function Open() {
         </div>
       </div>
 
-      <div className="row">
+      <div className="col-md-12 row">
         <div className="col-md-3 mt-4 col-sm-12">
           <label className="form-label">Payment Receipt Vouchers</label>
         </div>
-        <div className="col-md-7  col-sm-12">
-          <div className="row">
-            <div className="col-md-3  ">
+ 
+        
+            <div className="col-md-2  ">
               <label className="form-label">Search</label>
               <input
                 class=""
@@ -118,7 +140,19 @@ export default function Open() {
 
             </div>
 
-            <div className="col-md-3 mt-1 col-sm-12">
+            <div className="col-md-2  ">
+              <label className="form-label">Search customer</label>
+              <input
+                class=""
+                type="text"
+               placeholder="Search Customer"
+               onChange={searchCustomer}
+               value={searchCustName}
+              />
+
+            </div>
+
+            <div className="col-md-2 mt-1 col-sm-12">
               <button
                 className="button-style  group-button"
                 style={{ width: "120px" }} onClick={openVoucherButton}
@@ -127,7 +161,7 @@ export default function Open() {
               </button>
             </div>
 
-            <div className="col-md-3 mt-1 col-sm-12">
+            <div className="col-md-2 mt-1 col-sm-12">
               <button
                 className="button-style  group-button"
                 style={{ width: "80px" }} onClick={e => navigate('/UnitAccounts')}
@@ -135,16 +169,11 @@ export default function Open() {
                 Close
               </button>
             </div>
-          </div>
-        </div>
+         
+    
       </div>
 
-      <div className="row">
-        <div className="col-md-5  col-sm-12"></div>
-        <div className="col-md-7  col-sm-12">
-
-        </div>
-      </div>
+      
 
       <hr
         style={{

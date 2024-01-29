@@ -114,7 +114,7 @@ export default function InvoicesList() {
           </Table>
         </div>
         <div className="row col-md-6">
-          <div className="mb-5">
+          <div className="mb-5" style={{marginTop:'-10px'}}>
             <button
               className="button-style group-button"
               type="button"

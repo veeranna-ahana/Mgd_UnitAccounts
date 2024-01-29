@@ -233,7 +233,73 @@ export default function AccountSyncXMLFile() {
   // ? toast.success("Unit Vouchers In Sync")
   // : handleDownload();
 
-  const handleDownload = async () => {
+  // const handleDownload = async () => {
+  //   try {
+  //     const xmlString = arrayToXML({
+  //       getCustInvoice,
+  //       getInvoiceList,
+  //       getInvoiceTaxList,
+  //       getInvoiceSummary,
+  //       getPaymentReceipts,
+  //       getPaymentAdjusted,
+  //       getCancelledUnit,
+  //     });
+  //     const finalXmlString = `<?xml version="1.0" standalone="yes"?>\n${xmlString}`;
+  //     const blob = new Blob([finalXmlString], { type: "text/xml" });
+
+  //     const url = URL.createObjectURL(blob);
+  //     const a = document.createElement("a");
+  //     a.href = url;
+  //     const today = new Date();
+  //     const formattedDate = today
+  //       .toLocaleDateString("en-US", {
+  //         day: "numeric",
+  //         month: "short",
+  //         year: "numeric",
+  //       })
+  //       .replace(/\s+/g, "_"); // Replace spaces with underscores
+  //     const strUnitName = "Jigani";
+  //     // const strUnitName = data[0]?.UnitName || "DefaultUnit"; // Replace "DefaultUnit" with a default value if UnitName is not available
+  //     // a.download = "unit_hosync.xml";
+  //     // const fileXml = `${strUnitName}_to_HO_AcctsSync_${formattedDate}.xml`;
+  //     a.download = `${strUnitName}_to_HO_AcctsSync_${formattedDate}.xml`;
+  //     document.body.appendChild(a);
+  //     a.click();
+  //     URL.revokeObjectURL(url);
+  //     document.body.removeChild(a);
+
+  //     // const handle = await window.showSaveFilePicker({
+  //     //   suggestedName: fileXml,
+  //     //   types: [
+  //     //     {
+  //     //       description: "XML Files",
+  //     //       accept: {
+  //     //         "text/xml": [".xml"],
+  //     //       },
+  //     //     },
+  //     //   ],
+  //     // });
+
+  //     // const writable = await handle.createWritable();
+  //     // await writable.write(blob);
+  //     // await writable.close();
+
+  //     if (
+  //       getCustInvoice === 0 &&
+  //       getInvoiceList === 0 &&
+  //       getPaymentReceipts === 0 &&
+  //       getCancelledUnit === 0
+  //     ) {
+  //       toast.success("Unit Vouchers In Sync");
+  //     } else {
+  //       // <SendMail/>
+  //     }
+  //   } catch (error) {
+  //     console.error("Error saving file:", error);
+  //   }
+  // };
+
+  const handleDownload = () => {
     try {
       const xmlString = arrayToXML({
         getCustInvoice,
@@ -245,11 +311,12 @@ export default function AccountSyncXMLFile() {
         getCancelledUnit,
       });
       const finalXmlString = `<?xml version="1.0" standalone="yes"?>\n${xmlString}`;
-      const blob = new Blob([finalXmlString], { type: "text/xml" });
+      const dataUri =
+        "data:text/xml;charset=utf-8," + encodeURIComponent(finalXmlString);
 
-      const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
-      a.href = url;
+      a.href = dataUri;
+
       const today = new Date();
       const formattedDate = today
         .toLocaleDateString("en-US", {
@@ -259,41 +326,17 @@ export default function AccountSyncXMLFile() {
         })
         .replace(/\s+/g, "_"); // Replace spaces with underscores
       const strUnitName = "Jigani";
-      // const strUnitName = data[0]?.UnitName || "DefaultUnit"; // Replace "DefaultUnit" with a default value if UnitName is not available
-      // a.download = "unit_hosync.xml";
-      const fileXml = `${strUnitName}_to_HO_AcctsSync_${formattedDate}.xml`;
-      // a.download = `${strUnitName}_to_HO_AcctsSync_${formattedDate}.xml`;
-      // document.body.appendChild(a);
-      // a.click();
-      // URL.revokeObjectURL(url);
-      // document.body.removeChild(a);
+      const fileName = `${strUnitName}_to_HO_AcctsSync_${formattedDate}.xml`;
 
-      const handle = await window.showSaveFilePicker({
-        suggestedName: fileXml,
-        types: [
-          {
-            description: "XML Files",
-            accept: {
-              "text/xml": [".xml"],
-            },
-          },
-        ],
-      });
+      // Set the download attribute with the suggested filename
+      a.download = fileName;
 
-      const writable = await handle.createWritable();
-      await writable.write(blob);
-      await writable.close();
+      // Append the anchor to the document, click it, and remove it
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
 
-      if (
-        getCustInvoice === 0 &&
-        getInvoiceList === 0 &&
-        getPaymentReceipts === 0 &&
-        getCancelledUnit === 0
-      ) {
-        toast.success("Unit Vouchers In Sync");
-      } else {
-        // <SendMail/>
-      }
+      // Handle the rest of your logic here
     } catch (error) {
       console.error("Error saving file:", error);
     }

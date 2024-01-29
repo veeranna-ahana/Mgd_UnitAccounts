@@ -3,6 +3,7 @@ import { Table } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 
 export default function ImportOpenInvoice({ data }) {
+  const [selectRow, setSelectRow] = useState([]);
   const itemsPerPage = 200; // Number of items per page
   const [currentPage, setCurrentPage] = useState(0);
 
@@ -51,13 +52,18 @@ export default function ImportOpenInvoice({ data }) {
 
   function formatAmount(amount) {
     // Assuming amount is a number
-    const formattedAmount = new Intl.NumberFormat('en-IN', {
+    const formattedAmount = new Intl.NumberFormat("en-IN", {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     }).format(amount);
-  
+
     return formattedAmount;
-}
+  }
+
+  const selectedRowFun = (item, index) => {
+    let list = { ...item, index: index };
+    setSelectRow(list);
+  };
 
   return (
     <div>
@@ -84,7 +90,7 @@ export default function ImportOpenInvoice({ data }) {
           </thead>
           <tbody className="tablebody">
             {currentPageData
-              ? currentPageData.map((rv) => (
+              ? currentPageData.map((rv, key) => (
                   // <tr key={rv.DC_Inv_No} style={rv.Remarks==='Closed or Missing in HO' ? { background : "green"} : rv.Remarks==='Closed or Missing in Unit' ? {background : 'blue'}: rv.Remarks==='Value Different' ? {background : 'red'}:{background : 'none'} } >
                   <tr
                     key={rv.DC_Inv_No}
@@ -92,6 +98,10 @@ export default function ImportOpenInvoice({ data }) {
                       rv.Remarks === "Value Different"
                         ? { background: "#FF4500" }
                         : { background: "#49be25", whiteSpace: "nowrap" }
+                    }
+                    onClick={() => selectedRowFun(rv, key)}
+                    className={
+                      key === selectRow?.index ? "selcted-row-clr" : ""
                     }
                   >
                     <td>
@@ -105,10 +115,18 @@ export default function ImportOpenInvoice({ data }) {
                     <td>{rv.Cust_Name}</td>
                     <td>{rv.Inv_No}</td>
                     <td>{formatDate(rv.Inv_Date)}</td>
-                    <td style={{textAlign:'right'}}>{formatAmount(rv.Unit_GrandTotal)}</td>
-                    <td style={{textAlign:'right'}}>{formatAmount(rv.HO_GrandTotal)}</td>
-                    <td style={{textAlign:'right'}}>{formatAmount(rv.Unit_PymtAmtRecd)}</td>
-                    <td style={{textAlign:'right'}}>{formatAmount(rv.HO_PymtAmtRecd)}</td>
+                    <td style={{ textAlign: "right" }}>
+                      {formatAmount(rv.Unit_GrandTotal)}
+                    </td>
+                    <td style={{ textAlign: "right" }}>
+                      {formatAmount(rv.HO_GrandTotal)}
+                    </td>
+                    <td style={{ textAlign: "right" }}>
+                      {formatAmount(rv.Unit_PymtAmtRecd)}
+                    </td>
+                    <td style={{ textAlign: "right" }}>
+                      {formatAmount(rv.HO_PymtAmtRecd)}
+                    </td>
                     <td>{rv.Unit_DCStatus}</td>
                     <td>{rv.HO_DCStatus}</td>
                     <td>{rv.Remarks}</td>
