@@ -166,24 +166,24 @@ export default function ShowSyncStatus() {
       const strUnitName = "Jigani";
       // const strUnitName = data[0]?.UnitName || "DefaultUnit"; // Replace "DefaultUnit" with a default value if UnitName is not available
       // a.download = "unit_hosync.xml";
-      const fileXml = `${strUnitName}_Open_Invoices_List_Unit_DB_${formattedDate}.xml`;
-      // a.download = `${strUnitName}_Open_Invoices_List_Unit_DB_${formattedDate}.xml`;
-      // document.body.appendChild(a);
-      // a.click();
-      // URL.revokeObjectURL(url);
-      // document.body.removeChild(a);
+      // const fileXml = `${strUnitName}_Open_Invoices_List_Unit_DB_${formattedDate}.xml`;
+      a.download = `${strUnitName}_Open_Invoices_List_Unit_DB_${formattedDate}.xml`;
+      document.body.appendChild(a);
+      a.click();
+      URL.revokeObjectURL(url);
+      document.body.removeChild(a);
 
-      const handle = await window.showSaveFilePicker({
-        suggestedName: fileXml,
-        types: [
-          {
-            description: "XML Files",
-            accept: {
-              "text/xml": [".xml"],
-            },
-          },
-        ],
-      });
+      // const handle = await window.showSaveFilePicker({
+      //   suggestedName: fileXml,
+      //   types: [
+      //     {
+      //       description: "XML Files",
+      //       accept: {
+      //         "text/xml": [".xml"],
+      //       },
+      //     },
+      //   ],
+      // });
 
       const writable = await handle.createWritable();
       await writable.write(blob);
@@ -203,6 +203,7 @@ export default function ShowSyncStatus() {
       console.error("Error saving file:", error);
     }
   };
+  
 
   const selectedRowFun = (item, index, color) => {
     let list = { ...item, index };
@@ -941,7 +942,7 @@ export default function ShowSyncStatus() {
 
             <Tab eventKey="PR" title="Payment Recepients"></Tab>
 
-            <Tab eventKey="HOR" title=" Ho Payment Receipnts"></Tab>
+            <Tab eventKey="HOR" title=" HO Payment Receipnts"></Tab>
           </Tabs>
         </div>
       </div>

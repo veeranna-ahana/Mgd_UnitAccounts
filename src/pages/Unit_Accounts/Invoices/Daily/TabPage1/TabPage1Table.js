@@ -3,26 +3,37 @@ import { Table } from 'react-bootstrap';
 import axios from 'axios';
 import { baseURL } from '../../../../../api/baseUrl';
 
-export default function TabPage1Table({selectedDate}) {
+export default function TabPage1Table({ selectedDate }) {
 
-  
+
   //const formattedDay = selectedDate ? selectedDate.toLocaleDateString('en-GB').split(' ')[0]:'';
-//console.log("dateeeee tab", formattedDay);
+  //console.log("dateeeee tab", formattedDay);
   const [tabPage1Data, setTabPage1Data] = useState([])
 
   useEffect(() => {
-    
-    axios.get(baseURL+'/billingDetails/getTabPageData', 
-    {
-      params: {
-        date: selectedDate
-      }}  // Pass selectedDate as a query parameter
+
+    axios.get(baseURL + '/billingDetails/getTabPageData',
+      {
+        params: {
+          date: selectedDate
+        }
+      }  // Pass selectedDate as a query parameter
     )
       .then((res) => {
-         setTabPage1Data(res.data.Result)
+        setTabPage1Data(res.data.Result)
+        console.log("table",res.data.Result);
       })
   }, [selectedDate])
 
+
+  const [selectRow, setSelectRow] = useState("");
+  const selectedRowFun = (item, index) => {
+    let list = { ...item, index: index };
+    //  setSelectRow(initial)
+
+    setSelectRow(list);
+    // setState(true);
+  };
 
   return (
     <div>
@@ -42,19 +53,23 @@ export default function TabPage1Table({selectedDate}) {
               <th style={{ whiteSpace: 'nowrap' }}>DC_Inv Type</th>
               <th>InvoiceFor</th>
 
-             
+
             </tr>
 
           </thead>
 
           <tbody className='tablebody'>
             {
-              tabPage1Data.map((item, index) => {
+              tabPage1Data.map((item, key) => {
                 return (
                   <>
-                    <tr>
+                    <tr
+                    onClick={() => selectedRowFun(item, key)}
 
-                      <td>{index+1}</td>
+                    className={key === selectRow?.index ? 'selcted-row-clr' : ''}
+                    >
+
+                      <td>{key + 1}</td>
                       <td>{item.Sync_HOId}</td>
                       <td></td>
                       <td></td>
@@ -64,11 +79,6 @@ export default function TabPage1Table({selectedDate}) {
                       <td >{item.Formatted_DC_inv_Date}</td>
                       <td>{item.DC_InvType}</td>
                       <td>{item.InvoiceFor}</td>
-
-
-                     
-
-                      
                     </tr>
                   </>
                 )

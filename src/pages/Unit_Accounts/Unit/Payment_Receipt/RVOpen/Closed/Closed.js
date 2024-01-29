@@ -8,25 +8,25 @@ import { toast } from 'react-toastify';
 
 
 export default function Closed() {
-  const navigate=useNavigate();
+  const navigate = useNavigate();
   const [data, setData] = useState([])
   const [searchInput, setSearchInput] = useState('');
   const [filteredData, setFilteredData] = useState([]);
   const itemsPerPage = 100; // Number of items per page
-const [currentPage, setCurrentPage] = useState(0);
+  const [currentPage, setCurrentPage] = useState(0);
 
-// Calculate the start and end indices for the current page
-const startIndex = currentPage * itemsPerPage;
-const endIndex = startIndex + itemsPerPage;
+  // Calculate the start and end indices for the current page
+  const startIndex = currentPage * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
 
-// Get the data for the current page
-const currentPageData = filteredData.slice(startIndex, endIndex);
-console.log(currentPageData,'currentPageData')
-console.log(filteredData,'filteredData')
+  // Get the data for the current page
+  const currentPageData = filteredData.slice(startIndex, endIndex);
+  console.log(currentPageData, 'currentPageData')
+  console.log(filteredData, 'filteredData')
 
-const handlePageChange = ({ selected }) => {
-  setCurrentPage(selected);
-};
+  const handlePageChange = ({ selected }) => {
+    setCurrentPage(selected);
+  };
 
   const handleSearch = (event) => {
     console.log(event.target.value)
@@ -36,10 +36,10 @@ const handlePageChange = ({ selected }) => {
     // Filter the data based on Receipt Status, Receipt Vr No, and Transaction Type if there's a search input, otherwise, use the initial data
     const filtered = inputValue
       ? data.filter((rv) =>
-          rv.ReceiptStatus.toLowerCase().includes(inputValue.toLowerCase()) ||
-          rv.Recd_PVNo.toLowerCase().includes(inputValue.toLowerCase()) ||
-          rv.TxnType.toLowerCase().includes(inputValue.toLowerCase())
-        )
+        rv.ReceiptStatus.toLowerCase().includes(inputValue.toLowerCase()) ||
+        rv.Recd_PVNo.toLowerCase().includes(inputValue.toLowerCase()) ||
+        rv.TxnType.toLowerCase().includes(inputValue.toLowerCase())
+      )
       : data;
 
     setFilteredData(filtered);
@@ -47,7 +47,7 @@ const handlePageChange = ({ selected }) => {
 
   const ClosedReceipts = async () => {
     try {
-      const response = await axios.get(baseURL+'/Payment_Receipts/getclosedreceipts'); // Replace this URL with your API endpoint
+      const response = await axios.get(baseURL + '/Payment_Receipts/getclosedreceipts'); // Replace this URL with your API endpoint
       setData(response.data.Result);
       setFilteredData(response.data.Result)
     } catch (error) {
@@ -62,36 +62,53 @@ const handlePageChange = ({ selected }) => {
 
   const [selectRow, setSelectRow] = useState('');
   const selectedRowFun = (item, index) => {
-      let list = { ...item, index: index }
-      //  setSelectRow(initial)
+    let list = { ...item, index: index }
+    //  setSelectRow(initial)
 
 
-      setSelectRow(list);
-      // setState(true);
+    setSelectRow(list);
+    // setState(true);
 
   }
   const handleNavigate = (RecdPVID) => {
     navigate('/UnitAccounts/Unit/PaymentReceiptVoucher', { state: RecdPVID });
   };
 
-  const openVoucherButton=()=>{
-    if(selectRow!==''){
+  const openVoucherButton = () => {
+    if (selectRow !== '') {
       navigate('/UnitAccounts/Unit/PaymentReceiptVoucher', { state: selectRow.RecdPVID })
-      }
-      else{
-        toast.error("Select Row")
-      }
+    }
+    else {
+      toast.error("Select Row")
+    }
   }
 
   function formatAmount(amount) {
     // Assuming amount is a number
     const formattedAmount = new Intl.NumberFormat('en-IN', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
     }).format(amount);
 
     return formattedAmount;
-}
+  }
+
+  const [searchCustName, setSearchCustName] = useState([])
+  const searchCustomer = (event) => {
+
+    const inputValue = event.target.value;
+    setSearchCustName(inputValue);
+
+    // Filter the data based on Receipt Status, Receipt Vr No, and Transaction Type if there's a search input, otherwise, use the initial data
+    const filtered = inputValue
+      ? data.filter((rv) =>
+        rv.CustName.toLowerCase().includes(inputValue.toLowerCase())
+
+      )
+      : data;
+
+    setFilteredData(filtered);
+  }
   return (
     <div>
       <div className="col-md-12">
@@ -100,50 +117,60 @@ const handlePageChange = ({ selected }) => {
         </div>
       </div>
 
-      <div className="row">
+      
+
+
+      <div className="col-md-12 row">
         <div className="col-md-3 mt-4 col-sm-12">
           <label className="form-label">Payment Receipt Vouchers</label>
         </div>
-        <div className="col-md-7  col-sm-12">
-          <div className="row">
-            <div className="col-md-3  ">
-              
-               <label className="form-label">Search</label>
-               <input
-                  class=""
-                  type="text"
-                  onChange={handleSearch}
-                  value={searchInput}
-                />
-            </div>
-           
-            <div className="col-md-3 mt-1 col-sm-12">
-              <button
-                className="button-style  group-button"
-                style={{ width: "120px" }} onClick={openVoucherButton}
-              >
-                Open Voucher
-              </button>
-            </div>
 
-            <div className="col-md-3 mt-1 col-sm-12">
-              <button
-                className="button-style  group-button"
-                style={{ width: "80px" }} onClick={e=> navigate('/UnitAccounts')}
-              >
-              Close
-              </button>
-            </div>
-          </div>
+
+        <div className="col-md-2  ">
+          <label className="form-label">Search</label>
+          <input
+            class=""
+            type="text"
+            onChange={handleSearch}
+            value={searchInput}
+          />
+
         </div>
+
+        <div className="col-md-2  ">
+          <label className="form-label">Search customer</label>
+          <input
+            class=""
+            type="text"
+            placeholder="Search Customer"
+            onChange={searchCustomer}
+            value={searchCustName}
+          />
+
+        </div>
+
+        <div className="col-md-2 mt-1 col-sm-12">
+          <button
+            className="button-style  group-button"
+            style={{ width: "120px" }} onClick={openVoucherButton}
+          >
+            Open Voucher
+          </button>
+        </div>
+
+        <div className="col-md-2 mt-1 col-sm-12">
+          <button
+            className="button-style  group-button"
+            style={{ width: "80px" }} onClick={e => navigate('/UnitAccounts')}
+          >
+            Close
+          </button>
+        </div>
+
+
       </div>
 
-      <div className="row">
-        <div className="col-md-5  col-sm-12"></div>
-        <div className="col-md-7  col-sm-12">
-        
-        </div>
-      </div>
+
 
       <hr
         style={{
@@ -159,7 +186,7 @@ const handlePageChange = ({ selected }) => {
           style={{ marginLeft: "5px", border: "1px" }}
         >
           <thead className="tableHeaderBGColor">
-            <tr style={{whiteSpace:'nowrap'}}>
+            <tr style={{ whiteSpace: 'nowrap' }}>
               <th>Receipt Vr No</th>
               <th>Date</th>
               <th>Customer</th>
@@ -170,45 +197,45 @@ const handlePageChange = ({ selected }) => {
             </tr>
           </thead>
           <tbody className="tablebody">
-          {currentPageData ? currentPageData.map((rv,key) => (
-                  <tr 
-                  // onClick={() => handleNavigate(rv.Id)} className="row-button" key={rv.Id}
-                  style={{whiteSpace:'nowrap'}}
-                  onDoubleClick={() => handleNavigate(rv.Id)} className={key === selectRow?.index ? 'selcted-row-clr' : ''} key={rv.RecdPVID}
-                  onClick={() => selectedRowFun(rv, key)}
-                  >
-                    {/* <td>
+            {currentPageData ? currentPageData.map((rv, key) => (
+              <tr
+                // onClick={() => handleNavigate(rv.Id)} className="row-button" key={rv.Id}
+                style={{ whiteSpace: 'nowrap' }}
+                onDoubleClick={() => handleNavigate(rv.Id)} className={key === selectRow?.index ? 'selcted-row-clr' : ''} key={rv.RecdPVID}
+                onClick={() => selectedRowFun(rv, key)}
+              >
+                {/* <td>
                       <input
                         type='checkbox'
                         checked={selectedItems.includes(rv.Id)}
                         onChange={() => handleCheckboxChange(rv.Id)}
                       />
                     </td> */}
-                    <td>{rv.Recd_PVNo}</td>
-                    {/* <td>{rv.Recd_PV_Date}</td> */}
-                    <td>{new Date(rv.Recd_PV_Date).toLocaleDateString('en-GB').replace(/\//g, '-')}</td>
-                    <td>{rv.CustName}</td>
-                    <td style={{textAlign:'center'}}>{rv.TxnType}</td>
-                    <td style={{textAlign:'right'}}>{formatAmount(rv.Amount)}</td>
-                    <td style={{textAlign:'right'}}>{formatAmount(rv.On_account)}</td>
-                    <td>{rv.Description}</td>
-                  </tr>
-                )) : ''}
+                <td>{rv.Recd_PVNo}</td>
+                {/* <td>{rv.Recd_PV_Date}</td> */}
+                <td>{new Date(rv.Recd_PV_Date).toLocaleDateString('en-GB').replace(/\//g, '-')}</td>
+                <td>{rv.CustName}</td>
+                <td style={{ textAlign: 'center' }}>{rv.TxnType}</td>
+                <td style={{ textAlign: 'right' }}>{formatAmount(rv.Amount)}</td>
+                <td style={{ textAlign: 'right' }}>{formatAmount(rv.On_account)}</td>
+                <td>{rv.Description}</td>
+              </tr>
+            )) : ''}
           </tbody>
         </Table>
       </div>
       <ReactPaginate
-      previousLabel={'previous'}
-      nextLabel={'next'}
-      breakLabel={'...'}
-      pageCount={Math.ceil(filteredData.length / itemsPerPage)}
-      marginPagesDisplayed={2}
-      pageRangeDisplayed={5}
-      onPageChange={handlePageChange}
-      containerClassName={'pagination'}
-      subContainerClassName={'pages pagination'}
-      activeClassName={'active'}
-    />
+        previousLabel={'previous'}
+        nextLabel={'next'}
+        breakLabel={'...'}
+        pageCount={Math.ceil(filteredData.length / itemsPerPage)}
+        marginPagesDisplayed={2}
+        pageRangeDisplayed={5}
+        onPageChange={handlePageChange}
+        containerClassName={'pagination'}
+        subContainerClassName={'pages pagination'}
+        activeClassName={'active'}
+      />
     </div>
   )
 }

@@ -4,6 +4,7 @@ import axios from "axios";
 import ReactPaginate from "react-paginate";
 
 export default function OpenReceipt({ data }) {
+  const [selectRow, setSelectRow] = useState([]);
   const itemsPerPage = 200; // Number of items per page
   const [currentPage, setCurrentPage] = useState(0);
 
@@ -52,13 +53,18 @@ export default function OpenReceipt({ data }) {
 
   function formatAmount(amount) {
     // Assuming amount is a number
-    const formattedAmount = new Intl.NumberFormat('en-IN', {
+    const formattedAmount = new Intl.NumberFormat("en-IN", {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     }).format(amount);
-  
+
     return formattedAmount;
-}
+  }
+
+  const selectedRowFun = (item, index) => {
+    let list = { ...item, index: index };
+    setSelectRow(list);
+  };
 
   return (
     <div>
@@ -99,14 +105,25 @@ export default function OpenReceipt({ data }) {
           </thead>
           <tbody className="tablebody">
             {currentPageData
-              ? currentPageData.map((item) => (
-                  <tr key={item.RecdPVID} style={{ whiteSpace: "nowrap" }}>
+              ? currentPageData.map((item, key) => (
+                  <tr
+                    key={item.RecdPVID}
+                    style={{ whiteSpace: "nowrap" }}
+                    onClick={() => selectedRowFun(item, key)}
+                    className={
+                      key === selectRow?.index ? "selcted-row-clr" : ""
+                    }
+                  >
                     {/* Render table cells with corresponding data */}
                     <td>{item.TxnType}</td>
                     <td>{formatDate(item.Recd_PV_Date)}</td>
                     <td>{item.Recd_PV_Date}</td>
-                    <td style={{textAlign:'right'}}>{formatAmount(item.Amount)}</td>
-                    <td style={{textAlign:'right'}}>{formatAmount(item.On_account)}</td>
+                    <td style={{ textAlign: "right" }}>
+                      {formatAmount(item.Amount)}
+                    </td>
+                    <td style={{ textAlign: "right" }}>
+                      {formatAmount(item.On_account)}
+                    </td>
                     <td>{item.CustName}</td>
                     <td>{item.Id}</td>
                     <td>{item.UnitName}</td>
@@ -118,7 +135,9 @@ export default function OpenReceipt({ data }) {
                     <td>{item.ReceiptStatus}</td>
                     <td>{item.Cust_code}</td>
                     <td>{item.CustName}</td>
-                    <td style={{textAlign:'right'}}>{formatAmount(item.Amount)}</td>
+                    <td style={{ textAlign: "right" }}>
+                      {formatAmount(item.Amount)}
+                    </td>
                     <td></td>
                     <td>{item.DocuNo}</td>
                     <td>{item.Description}</td>
