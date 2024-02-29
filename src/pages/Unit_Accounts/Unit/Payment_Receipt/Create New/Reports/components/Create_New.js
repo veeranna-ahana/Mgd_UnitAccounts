@@ -104,6 +104,8 @@ function Create_New() {
     }));
   }, []);
 
+  
+
   const handleSave = async (e) => {
 
 
@@ -135,9 +137,11 @@ function Create_New() {
           toast.error(
             "Threading Error: Column Unit_Name is constrained to be Unique value unit_Name is already present"
           );
-        } else if (response.data.ReceiptStatus === "query") {
+        } 
+        else if (response.data.ReceiptStatus === "query") {
           toast.error("SQL error");
-        } else {
+        } 
+        else {
           let receipt_id = "";
 
           if (response.data.result.id) {
@@ -151,7 +155,9 @@ function Create_New() {
                 RecdPVID: response.data.result.id,
               },
             }));
-          } else {
+          } 
+          
+          else {
             receipt_id = response.data.result.insertId;
             setRvData((prevRvData) => ({
               ...prevRvData,
@@ -273,6 +279,7 @@ function Create_New() {
 
         else {
           setOpen(true);
+          getDCNo();
           setRvData((prevRvData) => ({
             ...prevRvData,
             open: true,
@@ -287,12 +294,73 @@ function Create_New() {
     e.preventDefault();
   };
 
+
+  const getDCNo = async () => {
+    const srlType = "PaymentReceipt";
+    const ResetPeriod = "FinanceYear";
+    const ResetValue = 0;
+    const VoucherNoLength = 4;
+    const unit = "Jigani";
+    try {
+      const response = await axios.post(baseURL + `/Payment_Receipts/getDCNo`, {
+        unit: unit,
+        srlType: srlType,
+        ResetPeriod: ResetPeriod,
+        ResetValue: ResetValue,
+        VoucherNoLength: VoucherNoLength,
+      });
+  
+       console.log("getDCNo Responseeeeeeeeeeeeee", response.data);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+  // const postDetails = async (e) => {
+  //   try {
+  //     console.log("insert id", rvData.insertId);
+  //     const response = await axios.put(
+  //       baseURL + "/Payment_Receipts/postReceipt/" + rvData.insertId,
+  //       rvData.data
+  //     );
+
+  //     if (response.data.ReceiptStatus === "fail") {
+  //       toast.error(
+  //         "Threading Error: Column Unit_Name is constrained to be a unique value; Unit_Name is already present"
+  //       );
+  //     } else if (response.data.ReceiptStatus === "query") {
+  //       toast.error("SQL error");
+  //       toast.error(response.data.ReceiptStatus);
+  //     } else {
+  //       toast.success("Data posted successfully");
+  //       openReceipt(rvData.postData.Cust_code, rvData.data.receipt_id);
+  //     }
+  //   } catch (err) {
+  //     console.error("Error in frontend", err);
+  //     toast.error("Error posting data");
+  //   }
+
+  //   handleDataReturn(rvData.data.receipt_details, "fetch");
+  //   //  e.preventDefault();
+  // };
+
+
+  //post data for runnning no table
   const postDetails = async (e) => {
+
+    const requestBody = {
+      srlType: "PaymentReceipt", // Replace srlTypeValue with the actual value you want to send
+      unit: "Jigani", // Replace unitValue with the actual value you want to send
+      data: rvData.data // Assuming rvData.data is the main data payload
+    };
+    
+   
+
     try {
       console.log("insert id", rvData.insertId);
       const response = await axios.put(
         baseURL + "/Payment_Receipts/postReceipt/" + rvData.insertId,
-        rvData.data
+        requestBody
       );
 
       if (response.data.ReceiptStatus === "fail") {
@@ -353,11 +421,14 @@ function Create_New() {
     setRvData((prevRvData) => ({ ...prevRvData, postData: postdata }));
 
     try {
+      //left table data
       const resp = await axios.get(
+
         baseURL + `/Payment_Receipts/getrvdata?receipt_id=${rowData}`
       );
 
       try {
+        //right table data(open invoices)
         const response = await axios.get(
           baseURL + `/Payment_Receipts/getinvlist?customercode=${cust_code}`
         );
@@ -397,9 +468,11 @@ function Create_New() {
     const fetchData = async () => {
       if (rowData !== "") {
         try {
+          //fetch Form data
           const response = await axios.get(
             baseURL + `/Payment_Receipts/getreceipt?receipt_id=${rowData}`
           );
+          console.log("res",response.data.Result[0]);
           getReceipts(
             response.data.Result[0].Cust_code,
             response.data.Result[0]
@@ -455,6 +528,7 @@ function Create_New() {
           baseURL + `/Payment_Receipts/getinvlist?customercode=${cust_code}`
         ),
       ]);
+      
 
       const updatedPostData = {
         ...rvData.postData, // Copy existing state
@@ -568,16 +642,41 @@ function Create_New() {
   }, [doubleClickSignal]);
 
   const handleRowSelect = (data) => {
-    console.log("hiiiiiiiiiiiiiiiiiiiiiii");
+    console.log("hiiiiiiiiiiiiiiiiiiiiiii", data);
     const selectedRow = rvData.firstTableArray.find(
       (row) => row.PVSrlID === data.PVSrlID
     );
+    console.log("sel row", selectedRow);
 
     setRvData({
       ...rvData,
       firstTableArray: selectedRow ? [] : [data],
     });
+
+
   };
+
+
+  //  const handleRowSelect = (data) => {
+  //   console.log("hiiiiiiiiiiiiiiiiiiiiiii", data);
+  //   const selectedRow = rvData.firstTableArray.find(
+  //     (row) => row.PVSrlID === data.PVSrlID
+  //   );
+  //   console.log("sel row", selectedRow);
+
+  //   const updatedFirstTableArray = selectedRow ? [] : [data];
+  // const updatedRvData = {
+  //   ...rvData,
+  //   firstTableArray: updatedFirstTableArray,
+  // };
+
+  // setRvData(updatedRvData); // Update the state asynchronously
+  // console.log("update ",updatedRvData.firstTableArray);
+
+  // return updatedRvData.firstTableArray;
+
+
+  // };
 
   console.log("post data onaccount", rvData.postData.On_account);
 
@@ -588,96 +687,39 @@ function Create_New() {
 
 
 
-  // const handleInputChange = (e, invNo) => {
-  //   try {
-  //     const { name, value } = e.target;
-
-  //     const updateData = async () => {
-  //       const updatedReceiptDetails = rvData.data.receipt_details.map((row) =>
-  //         row.Inv_No === invNo
-  //           ? {
-  //               ...row,
-  //               [name]: value,
-  //             }
-  //           : row
-  //       );
-
-  //       const totalReceiveNow = updatedReceiptDetails.reduce(
-  //         (total, row) => total + parseFloat(row.Receive_Now || 0),
-  //         0
-  //       );
-
-  //       const newOnAccount =
-  //         parseFloat(rvData.postData.Amount) - totalReceiveNow;
-
-  //       console.log("NEWONACCOUNT", newOnAccount);
-
-  //       // Update On_account using the updateOnAccount API
-  //       const updateOnAccountResponse = await axios.post(
-  //         baseURL + "/Payment_Receipts/updateOnAccount",
-  //         {
-  //           onAccountValue: newOnAccount,
-  //           RecdPVID: rvData.postData.RecdPVID,
-  //         }
-  //       );
-
-  //       const selectedRow = rvData.firstTableArray[0];
-  //       if (selectedRow) {
-  //         selectedRow.Receive_Now = value;
-  //       }
-
-  //       // Update On_account in rvData.postData with the result from the updateOnAccount API
-  //       setRvData((prevRvData) => ({
-  //         ...prevRvData,
-  //         data: {
-  //           ...prevRvData.data,
-  //           receipt_details: updatedReceiptDetails,
-  //         },
-  //         postData: {
-  //           ...prevRvData.postData,
-  //           On_account:
-  //             updateOnAccountResponse.data.updatedOnAccount[0]?.On_account,
-  //         },
-  //       }));
-  //     };
-
-  //     updateData();
-  //   } catch (error) {
-  //     console.error("Error in handleInputChange:", error);
-  //     // Handle error if needed
-  //   }
-  // };
+  
 
 
 
-  const handleInputChange = async (e, invNo) => {
+  const handleInputChange = async (e, invNo, data) => {
+    //handleRowSelect(data);
     try {
       const { name, value } = e.target;
-  
+
       // Find the current receipt detail for the specified Inv_No
       const currentReceiptDetail = rvData.data.receipt_details.find(
         (row) => row.Inv_No === invNo
       );
-  
+
       // Calculate the difference between the new and old Receive_Now values
       const receiveNowDifference = parseFloat(value) - parseFloat(currentReceiptDetail.Receive_Now || 0);
-  
+
       const updatedReceiptDetails = rvData.data.receipt_details.map((row) =>
         row.Inv_No === invNo ? { ...row, [name]: value } : row
       );
-  
+
       const updatedTotalReceiveNow = updatedReceiptDetails.reduce(
         (total, row) => total + parseFloat(row.Receive_Now || 0),
         0
       );
-  
+
       const newOnAccount =
         parseFloat(rvData.postData.Amount) - updatedTotalReceiveNow;
-  
+
       console.log("NEWONACCOUNT", newOnAccount);
-  
+
       // Check if the difference between the new and old Receive_Now values exceeds newOnAccount
-      if ( newOnAccount >= 0) {
+      if (newOnAccount >= 0) {
         // Update On_account using the updateOnAccount API
         const updateOnAccountResponse = await axios.post(
           baseURL + "/Payment_Receipts/updateOnAccount",
@@ -686,9 +728,9 @@ function Create_New() {
             RecdPVID: rvData.postData.RecdPVID,
           }
         );
-  
+
         // Check if the updated On_account would be negative
-        if (  updateOnAccountResponse.data.updatedOnAccount[0]?.On_account >= 0 ) {
+        if (updateOnAccountResponse.data.updatedOnAccount[0]?.On_account >= 0) {
           // Update On_account in rvData.postData with the result from the updateOnAccount API
           setRvData((prevRvData) => ({
             ...prevRvData,
@@ -704,18 +746,20 @@ function Create_New() {
           }));
         }
 
-       
-      } 
+        rvData.firstTableArray = [];
+      }
       else {
-        
+
         toast.error("Cannot Receive more than Invoice Amount");
       }
     } catch (error) {
       console.error("Error in handleInputChange:", error);
       // Handle error if needed
     }
+
+
   };
-  
+
 
   const addToVoucher = async () => {
 
@@ -734,25 +778,7 @@ function Create_New() {
       const RecdPVID = rvData.postData.RecdPVID;
       console.log("first table arry", rvData.firstTableArray, rvData.data.receipt_details);
 
-      // if(rvData.data.receipt_details.length>0 ){
-      //       const selectedRow = rvData.firstTableArray[0];
-
-      //       if (parseFloat(selectedRow.Receive_Now) < 0) {
-      //         toast.error("Receive Now cannot be negative");
-      //         return;
-      //       }
-
-      //       if (
-      //         parseFloat(selectedRow.Receive_Now) +
-      //           parseFloat(selectedRow.Amt_received) >
-      //         parseFloat(selectedRow.Inv_Amount)
-      //       ) {
-      //         toast.error("Cannot Receive More than Invoice Amount");
-      //         return;
-      //       }
-
-
-      //     }
+      
 
 
 
@@ -865,12 +891,7 @@ function Create_New() {
   };
 
 
-
-
-
-
-
-
+ 
 
   const removeVoucher = async () => {
     try {
@@ -960,6 +981,13 @@ function Create_New() {
     }
   };
 
+
+
+
+
+
+
+
   const onBlurr = async () => {
     const res = axios.put(
       baseURL +
@@ -1024,15 +1052,7 @@ function Create_New() {
           const amtReceived = parseFloat(row.Amt_received) || 0;
           const invAmount = parseFloat(row.Inv_Amount) || 0;
 
-          // if (receiveNow < 0) {
-          //   toast.error("Enter Positive Amount");
-          //   return false;
-          // }
-
-          // if (amtReceived + receiveNow > invAmount) {
-          //   toast.error("Cannot Receive More than Invoice Amount");
-          //   return false;
-          // }
+          
 
           return true;
         });
@@ -1097,6 +1117,8 @@ function Create_New() {
         }
 
         else {
+
+
           setDeleteDraft(true);
           e.preventDefault();
         }
@@ -1105,12 +1127,20 @@ function Create_New() {
       });
     }
 
-   
+
+    else {
+
+      if (rvData.postData.CustName === '' || rvData.postData.TxnType === '') {
+
+        toast.error("Customer Name and Transaction type can not be empty")
+      }
       else {
+
         setDeleteDraft(true);
         e.preventDefault();
       }
-  
+    }
+
 
     e.preventDefault();
 
@@ -1152,9 +1182,9 @@ function Create_New() {
             },
 
           }));
-          
+
           toast.success("Deleted Successfully");
-window.location.reload();
+          window.location.reload();
 
         } else {
           alert("error");
@@ -1166,11 +1196,10 @@ window.location.reload();
 
   const [pdfVoucher, setPdfVoucher] = useState(false);
 
+  
+
   const pdfSubmit = (e) => {
-
-
-
-    if(rvData.data.receipt_details.length===0){
+    if (rvData.data.receipt_details.length === 0) {
       setPdfVoucher(true);
     }
     const isAnyEmptyReceiveNow = rvData.firstTableArray.some(
@@ -1201,15 +1230,15 @@ window.location.reload();
 
         else {
           setPdfVoucher(true);
-    e.preventDefault();
+          e.preventDefault();
         }
 
         return true;
       });
     }
 
-    
-    
+
+
   }
 
   const nav = useNavigate()
@@ -1225,7 +1254,7 @@ window.location.reload();
     return formattedAmount;
   }
 
-  console.log('out nooo',selectedOption);
+  console.log('out nooo', selectedOption);
 
   return (
     <div>
@@ -1252,7 +1281,7 @@ window.location.reload();
               option && option.Cust_name ? option.Cust_name.toString() : ""
             }
             onChange={handleTypeaheadChange}
-          // disabled={rvData.postData.CustName!==''}
+           disabled={rvData.postData.ReceiptStatus!=='Draft'}
           />
         </div>
 
@@ -1429,7 +1458,7 @@ window.location.reload();
 
         <div className="col-md-6">
 
-          
+
           <button
             className={
               rvData.postData.ReceiptStatus != "Draft"
@@ -1590,7 +1619,7 @@ window.location.reload();
                               handleInputChange(
                                 e,
                                 data.Inv_No,
-                                data.Receive_Now
+                                data
                               )
                             }
                             disabled={rvData && rvData.postData.ReceiptStatus !== "Draft"

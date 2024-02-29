@@ -35,23 +35,61 @@ export default function TabPage1Table({ selectedDate }) {
     // setState(true);
   };
 
+
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
+  const requestSort = (key) => {
+    let direction = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") {
+      direction = "desc";
+    }
+    setSortConfig({ key, direction });
+  };
+  
+  
+  
+  
+  const sortedData = () => {
+    const dataCopy = [...tabPage1Data];
+  
+    if (sortConfig.key) {
+      dataCopy.sort((a, b) => {
+        let valueA = a[sortConfig.key];
+        let valueB = b[sortConfig.key];
+   
+       
+        if (sortConfig.key === "Amount") {
+          valueA = parseFloat(valueA);
+          valueB = parseFloat(valueB);
+        }
+   
+        if (valueA < valueB) {
+          return sortConfig.direction === "asc" ? -1 : 1;
+        }
+        if (valueA > valueB) {
+          return sortConfig.direction === "asc" ? 1 : -1;
+        }
+        return 0;
+      });
+    }
+    return dataCopy;
+  };
   return (
     <div>
       <div className='col-md-12' style={{ height: '300px', overflowY: 'scroll', overflowX: 'scroll', }}>
         <Table striped className="table-data border">
           <thead className="tableHeaderBGColor">
-            <tr>
+            <tr style={{ whiteSpace: 'nowrap' }}>
 
-              <th>Id</th>
-              <th>Sync_HOId</th>
-              <th>Unit_Uid</th>
-              <th>Selected</th>
-              <th>UnitName</th>
-              <th>DC_Inv_No</th>
-              <th>ScheduleId</th>
-              <th>Dc_inv_Date</th>
-              <th style={{ whiteSpace: 'nowrap' }}>DC_Inv Type</th>
-              <th>InvoiceFor</th>
+              <th  >Id</th>
+              <th onClick={() => requestSort("Sync_HOId")}>Sync_HOId</th>
+              {/* <th>Unit_Uid</th>
+              <th>Selected</th> */}
+              <th onClick={() => requestSort("UnitName")}>UnitName</th>
+              <th onClick={() => requestSort("DC_Inv_No")}>DC_Inv_No</th>
+              <th onClick={() => requestSort("ScheduleId")}>ScheduleId</th>
+              <th onClick={() => requestSort("Formatted_DC_inv_Date")}>Dc_inv_Date</th>
+              <th onClick={() => requestSort("DC_InvType")} >DC_Inv Type</th>
+              <th onClick={() => requestSort("InvoiceFor")}>InvoiceFor</th>
 
 
             </tr>
@@ -60,7 +98,7 @@ export default function TabPage1Table({ selectedDate }) {
 
           <tbody className='tablebody'>
             {
-              tabPage1Data.map((item, key) => {
+              sortedData().map((item, key) => {
                 return (
                   <>
                     <tr
@@ -71,8 +109,8 @@ export default function TabPage1Table({ selectedDate }) {
 
                       <td>{key + 1}</td>
                       <td>{item.Sync_HOId}</td>
-                      <td></td>
-                      <td></td>
+                      {/* <td></td>
+                      <td></td> */}
                       <td>{item.UnitName}</td>
                       <td>{item.DC_Inv_No}</td>
                       <td>{item.ScheduleId}</td>

@@ -3,6 +3,46 @@ import { Table } from "react-bootstrap";
 
 export default function TaxSummary({ getMonthReport }) {
   const [selectRow, setSelectRow] = useState([]);
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
+
+  // sorting function for table headings of the table 
+  const requestSort = (key) => {
+    let direction = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") {
+      direction = "desc";
+    }
+    setSortConfig({ key, direction });
+  };
+
+  const sortedData = () => {
+    const dataCopy = [...getMonthReport];
+
+    if (sortConfig.key) {
+      dataCopy.sort((a, b) => {
+        let valueA = a[sortConfig.key];
+        let valueB = b[sortConfig.key];
+   
+        // Convert only for the "intiger" columns
+        if (
+         sortConfig.key === "TaxPercent" || 
+         sortConfig.key === "TaxAmount" || 
+         sortConfig.key === "TaxableAmount" 
+         ) {
+          valueA = parseFloat(valueA);
+          valueB = parseFloat(valueB);
+        }
+   
+        if (valueA < valueB) {
+          return sortConfig.direction === "asc" ? -1 : 1;
+        }
+        if (valueA > valueB) {
+          return sortConfig.direction === "asc" ? 1 : -1;
+        }
+        return 0;
+      });
+    }
+    return dataCopy;
+  };
 
   const selectedRowFun = (item, index) => {
     let list = { ...item, index: index };
@@ -32,15 +72,15 @@ export default function TaxSummary({ getMonthReport }) {
         <Table striped className="table-data border" style={{ border: "1px" }}>
           <thead className="tableHeaderBGColor">
             <tr style={{ whiteSpace: "nowrap" }}>
-              <th>Invoice Type</th>
-              <th>Tax Name</th>
-              <th>Tax %</th>
-              <th style={{ textAlign: "right" }}>Taxable Amount</th>
-              <th style={{ textAlign: "right" }}>Tax Amount</th>
+              <th onClick={() => requestSort("InvoiceType")}>Invoice Type</th>
+              <th onClick={() => requestSort("TaxName")}>Tax Name</th>
+              <th onClick={() => requestSort("TaxPercent")}>Tax %</th>
+              <th style={{ textAlign: "right" }} onClick={() => requestSort("TaxableAmount")}>Taxable Amount</th>
+              <th style={{ textAlign: "right" }} onClick={() => requestSort("TaxAmount")}>Tax Amount</th>
             </tr>
           </thead>
           <tbody className="tablebody">
-            {getMonthReport.map((item, key) => {
+            {sortedData()?.map((item, key) => {
                const taxPercent = parseFloat(item.TaxPercent);
                const formattedTaxPercent =
                  taxPercent % 1 !== 0

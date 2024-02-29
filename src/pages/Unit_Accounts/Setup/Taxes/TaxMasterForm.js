@@ -30,6 +30,7 @@ export default function TaxMasterForm() {
     const [taxData, setTaxData] = useState([]);
     const [deleteID, setDeleteID] = useState(false);
     const [taxPostData, setTaxPostData] = useState(initial);
+    const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
 
     useEffect(() => {
 
@@ -89,6 +90,42 @@ export default function TaxMasterForm() {
 
 
 
+    const requestSort = (key) => {
+        let direction = "asc";
+        if (sortConfig.key === key && sortConfig.direction === "asc") {
+          direction = "desc";
+        }
+        setSortConfig({ key, direction });
+      };
+      
+      
+      
+      
+      const sortedData = () => {
+        const dataCopy = [...taxData];
+      
+        if (sortConfig.key) {
+          dataCopy.sort((a, b) => {
+            let valueA = a[sortConfig.key];
+            let valueB = b[sortConfig.key];
+       
+      
+            if (sortConfig.key === "Tax_Percent") {
+              valueA = parseFloat(valueA);
+              valueB = parseFloat(valueB);
+            }
+       
+            if (valueA < valueB) {
+              return sortConfig.direction === "asc" ? -1 : 1;
+            }
+            if (valueA > valueB) {
+              return sortConfig.direction === "asc" ? 1 : -1;
+            }
+            return 0;
+          });
+        }
+        return dataCopy;
+      };
 
 
 
@@ -106,18 +143,19 @@ export default function TaxMasterForm() {
                 <div style={{ height: "380px", overflowY: 'scroll', overflowX: 'scroll' }}>
                     <Table striped className="table-data border">
                         <thead className="tableHeaderBGColor">
-                            <tr>
-                                <th>Id</th>
-                                <th>TaxName</th>
-                                <th>PrintName</th>
-                                <th style={{ whiteSpace: 'nowrap' }}>Tax %</th>
-                                <th style={{ whiteSpace: 'nowrap' }}>Tax on</th>
-                                <th style={{ whiteSpace: 'nowrap' }}>Effective From</th>
-                                <th style={{ whiteSpace: 'nowrap' }}>Effective To</th>
-                                <th style={{ whiteSpace: 'nowrap' }}>Acct Head</th>
+                            <tr style={{ whiteSpace: 'nowrap' }}>
+                                <th
+                                  onClick={() => requestSort("TaxID")}  >Id</th>
+                                <th  onClick={() => requestSort("TaxName")}  >TaxName</th>
+                                <th  onClick={() => requestSort("TaxPrintName")} >PrintName</th>
+                                <th  onClick={() => requestSort("Tax_Percent")}>Tax %</th>
+                                <th onClick={() => requestSort("TaxOn")}>Tax on</th>
+                                <th onClick={() => requestSort("EffectiveFrom")}>Effective From</th>
+                                <th onClick={() => requestSort("EffectiveTO")}>Effective To</th>
+                                <th onClick={() => requestSort("AcctHead")}>Acct Head</th>
                                 <th>Service</th>
                                 <th>Sales</th>
-                                <th style={{ whiteSpace: 'nowrap' }}>Job Work</th>
+                                <th >Job Work</th>
                                 <th>IGST</th>
                                 <th>Tally</th>
                             </tr>
@@ -126,7 +164,7 @@ export default function TaxMasterForm() {
 
                         <tbody>
                             {
-                                taxData.map((item, key) => {
+                                sortedData().map((item, key) => {
 
                                     const formattedEffectiveFrom = new Date(item.EffectiveFrom).toLocaleDateString('en-CA');
                                     const formattedEffectiveTO = new Date(item.EffectiveTO).toLocaleDateString('en-CA');
@@ -231,7 +269,7 @@ export default function TaxMasterForm() {
                                     : parseFloat(selectRow.Tax_Percent).toFixed(0)
                             }
 
-                                disabled name='Tax_Percent' />
+                                disabled   name='Tax_Percent' />
                         </div>
 
 

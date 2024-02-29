@@ -3,6 +3,52 @@ import { Table } from "react-bootstrap";
 
 export default function InvoiceSummary({ getMonthInvReport }) {
   const [selectRow, setSelectRow] = useState([]);
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
+
+  // sorting function for table headings of the table 
+  const requestSort = (key) => {
+    let direction = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") {
+      direction = "desc";
+    }
+    setSortConfig({ key, direction });
+  };
+
+  const sortedData = () => {
+    const dataCopy = [...getMonthInvReport];
+
+    if (sortConfig.key) {
+      dataCopy.sort((a, b) => {
+        let valueA = a[sortConfig.key];
+        let valueB = b[sortConfig.key];
+   
+        // Convert only for the "intiger" columns
+        if (
+         sortConfig.key === "GrandTotal" || 
+         sortConfig.key === "PymtAmtRecd" || 
+         sortConfig.key === "MtrlChg" || 
+         sortConfig.key === "Discount" || 
+         sortConfig.key === "Del_Chg" || 
+         sortConfig.key === "TptCharges" || 
+         sortConfig.key === "TaxAmount" || 
+         sortConfig.key === "InvTotal" || 
+         sortConfig.key === "MaterialValue"
+         ) {
+          valueA = parseFloat(valueA);
+          valueB = parseFloat(valueB);
+        }
+   
+        if (valueA < valueB) {
+          return sortConfig.direction === "asc" ? -1 : 1;
+        }
+        if (valueA > valueB) {
+          return sortConfig.direction === "asc" ? 1 : -1;
+        }
+        return 0;
+      });
+    }
+    return dataCopy;
+  };
 
   const selectedRowFun = (item, index) => {
     let list = { ...item, index: index };
@@ -32,22 +78,22 @@ export default function InvoiceSummary({ getMonthInvReport }) {
         <Table striped className="table-data border" style={{ border: "1px" }}>
           <thead className="tableHeaderBGColor">
             <tr style={{ whiteSpace: "nowrap" }}>
-              <th>Customer Name</th>
-              <th>Invoice No</th>
-              <th>Invoice Type</th>
-              <th>Grand Total</th>
-              <th>Received</th>
-              <th>Value Added</th>
-              <th>Material Value</th>
-              <th>Discount</th>
-              <th>Delivery Chg</th>
-              <th>Transport Charges</th>
-              <th>Tax Amount</th>
-              <th>Inv Total</th>
+              <th onClick={() => requestSort("Cust_Name")}>Customer Name</th>
+              <th onClick={() => requestSort("Inv_No")}>Invoice No</th>
+              <th onClick={() => requestSort("DC_InvType")}>Invoice Type</th>
+              <th onClick={() => requestSort("GrandTotal")}>Grand Total</th>
+              <th onClick={() => requestSort("PymtAmtRecd")}>Received</th>
+              <th onClick={() => requestSort("MaterialValue")}>Value Added</th>
+              <th onClick={() => requestSort("MtrlChg")}>Material Value</th>
+              <th onClick={() => requestSort("Discount")}>Discount</th>
+              <th onClick={() => requestSort("Del_Chg")}>Delivery Chg</th>
+              <th onClick={() => requestSort("TptCharges")}>Transport Charges</th>
+              <th onClick={() => requestSort("TaxAmount")}>Tax Amount</th>
+              <th onClick={() => requestSort("InvTotal")}>Inv Total</th>
             </tr>
           </thead>
           <tbody className="tablebody">
-            {getMonthInvReport.map((item, key) => {
+            {sortedData()?.map((item, key) => {
               return (
                 <tr
                   style={{ whiteSpace: "nowrap" }}

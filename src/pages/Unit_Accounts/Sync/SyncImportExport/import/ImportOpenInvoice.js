@@ -6,6 +6,47 @@ export default function ImportOpenInvoice({ data }) {
   const [selectRow, setSelectRow] = useState([]);
   const itemsPerPage = 200; // Number of items per page
   const [currentPage, setCurrentPage] = useState(0);
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
+
+   // sorting function for table headings of the table
+   const requestSort = (key) => {
+    let direction = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") {
+      direction = "desc";
+    }
+    setSortConfig({ key, direction });
+  };
+
+  const sortedData = () => {
+    const dataCopy = [...currentPageData];
+
+    if (sortConfig.key) {
+      dataCopy.sort((a, b) => {
+        let valueA = a[sortConfig.key];
+        let valueB = b[sortConfig.key];
+
+        // Convert only for the "intiger" columns
+        if (
+          sortConfig.key === "Unit_GrandTotal" ||
+          sortConfig.key === "HO_GrandTotal" ||
+          sortConfig.key === "Unit_PymtAmtRecd" ||
+          sortConfig.key === "HO_PymtAmtRecd"
+        ) {
+          valueA = parseFloat(valueA);
+          valueB = parseFloat(valueB);
+        }
+
+        if (valueA < valueB) {
+          return sortConfig.direction === "asc" ? -1 : 1;
+        }
+        if (valueA > valueB) {
+          return sortConfig.direction === "asc" ? 1 : -1;
+        }
+        return 0;
+      });
+    }
+    return dataCopy;
+  };
 
   // Calculate the start and end indices for the current page
   const startIndex = currentPage * itemsPerPage;
@@ -75,22 +116,22 @@ export default function ImportOpenInvoice({ data }) {
           <thead className="tableHeaderBGColor">
             <tr>
               <th>Select</th>
-              <th>Type</th>
-              <th>Customer</th>
-              <th>Invoice No</th>
-              <th>Date</th>
-              <th>Invoice Value Unit</th>
-              <th>Invoice Value HO</th>
-              <th>Received Unit</th>
-              <th>Received HO</th>
-              <th>Unit_DC_Status</th>
-              <th>HO_DC_Status</th>
-              <th>Remarks</th>
+              <th onClick={() => requestSort("DC_InvType")}>Type</th>
+              <th onClick={() => requestSort("Cust_Name")}>Customer</th>
+              <th onClick={() => requestSort("Inv_No")}>Invoice No</th>
+              <th onClick={() => requestSort("Inv_Date")}>Date</th>
+              <th onClick={() => requestSort("Unit_GrandTotal")}>Invoice Value Unit</th>
+              <th onClick={() => requestSort("HO_GrandTotal")}>Invoice Value HO</th>
+              <th onClick={() => requestSort("Unit_PymtAmtRecd")}>Received Unit</th>
+              <th onClick={() => requestSort("HO_PymtAmtRecd")}>Received HO</th>
+              <th onClick={() => requestSort("Unit_DCStatus")}>Unit_DC_Status</th>
+              <th onClick={() => requestSort("HO_DCStatus")}>HO_DC_Status</th>
+              <th onClick={() => requestSort("Remarks")}>Remarks</th>
             </tr>
           </thead>
           <tbody className="tablebody">
-            {currentPageData
-              ? currentPageData.map((rv, key) => (
+            {sortedData()
+              ? sortedData().map((rv, key) => (
                   // <tr key={rv.DC_Inv_No} style={rv.Remarks==='Closed or Missing in HO' ? { background : "green"} : rv.Remarks==='Closed or Missing in Unit' ? {background : 'blue'}: rv.Remarks==='Value Different' ? {background : 'red'}:{background : 'none'} } >
                   <tr
                     key={rv.DC_Inv_No}

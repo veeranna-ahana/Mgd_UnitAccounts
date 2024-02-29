@@ -3,6 +3,48 @@ import { Table } from "react-bootstrap";
 
 export default function AllOutstandingBills({ getAllOutStanding }) {
   const [selectRow, setSelectRow] = useState([]);
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
+
+  // sorting function for table headings of the table 
+  const requestSort = (key) => {
+    let direction = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") {
+      direction = "desc";
+    }
+    setSortConfig({ key, direction });
+  };
+
+  const sortedData = () => {
+    const dataCopy = [...getAllOutStanding];
+
+    if (sortConfig.key) {
+      dataCopy.sort((a, b) => {
+        let valueA = a[sortConfig.key];
+        let valueB = b[sortConfig.key];
+   
+        // Convert only for the "intiger" columns
+        if (
+         sortConfig.key === "Cust_Code" || 
+         sortConfig.key === "totalBilling" || 
+         sortConfig.key === "Outstanding" || 
+         sortConfig.key === "AmountReceived" 
+         ) {
+          valueA = parseFloat(valueA);
+          valueB = parseFloat(valueB);
+        }
+   
+        if (valueA < valueB) {
+          return sortConfig.direction === "asc" ? -1 : 1;
+        }
+        if (valueA > valueB) {
+          return sortConfig.direction === "asc" ? 1 : -1;
+        }
+        return 0;
+      });
+    }
+    return dataCopy;
+  };
+
 
   const selectedRowFun = (item, index) => {
     let list = { ...item, index: index };
@@ -32,20 +74,20 @@ export default function AllOutstandingBills({ getAllOutStanding }) {
         <Table striped className="table-data border" style={{ border: "1px" }}>
           <thead className="tableHeaderBGColor">
             <tr style={{ whiteSpace: "nowrap" }}>
-              <th>Customer Code</th>
-              <th>Customer Name</th>
-              <th>Total Billing</th>
-              <th>Amount Received</th>
+              <th onClick={() => requestSort("Cust_Code")}>Customer Code</th>
+              <th onClick={() => requestSort("Cust_Name")}>Customer Name</th>
+              <th onClick={() => requestSort("totalBilling")}>Total Billing</th>
+              <th onClick={() => requestSort("AmountReceived")}>Amount Received</th>
               <th>Balance</th>
-              <th>Unit Name</th>
+              <th onClick={() => requestSort("UnitName")}>Unit Name</th>
               <th>Value Added</th>
               <th>Material Value</th>
               <th>Period</th>
-              <th>Outstanding</th>
+              <th onClick={() => requestSort("Outstanding")}>Outstanding</th>
             </tr>
           </thead>
           <tbody className="tablebody">
-            {getAllOutStanding?.map((item, key) => {
+            {sortedData()?.map((item, key) => {
               return (
                 <tr
                   style={{ whiteSpace: "nowrap" }}

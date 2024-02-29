@@ -3,6 +3,51 @@ import { Table } from "react-bootstrap";
 
 export default function InvoiceSummary({ getMonthInvReport }) {
   const [selectRow, setSelectRow] = useState([]);
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
+
+  // sorting function for table headings of the table
+  const requestSort = (key) => {
+    let direction = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") {
+      direction = "desc";
+    }
+    setSortConfig({ key, direction });
+  };
+
+  const sortedData = () => {
+    const dataCopy = [...getMonthInvReport];
+
+    if (sortConfig.key) {
+      dataCopy.sort((a, b) => {
+        let valueA = a[sortConfig.key];
+        let valueB = b[sortConfig.key];
+   
+        // Convert only for the "intiger" columns
+        if (
+        sortConfig.key === "GrandTotal" || 
+        sortConfig.key === "ValueAdded" || 
+        sortConfig.key === "MaterialValue" || 
+        sortConfig.key === "Discount" || 
+        sortConfig.key === "Del_Chg" || 
+        sortConfig.key === "TptCharges" || 
+        sortConfig.key === "TaxAmount" || 
+        sortConfig.key === "InvTotal" || 
+        sortConfig.key === "PymtAmtRecd") {
+          valueA = parseFloat(valueA);
+          valueB = parseFloat(valueB);
+        }
+   
+        if (valueA < valueB) {
+          return sortConfig.direction === "asc" ? -1 : 1;
+        }
+        if (valueA > valueB) {
+          return sortConfig.direction === "asc" ? 1 : -1;
+        }
+        return 0;
+      });
+    }
+    return dataCopy;
+  };
 
   const selectedRowFun = (item, index) => {
     let list = { ...item, index: index };
@@ -33,21 +78,21 @@ export default function InvoiceSummary({ getMonthInvReport }) {
           <thead className="tableHeaderBGColor">
             <tr style={{ whiteSpace: "nowrap" }}>
               <th>With Tax</th>
-              <th>Branch Sale</th>
-              <th>Invoice Type</th>
-              <th style={{textAlign:'right'}}>Grand Total</th>
-              <th style={{textAlign:'right'}}>Received</th>
-              <th style={{textAlign:'right'}}>Value Added</th>
-              <th style={{textAlign:'right'}}>Material Value</th>
-              <th style={{textAlign:'right'}}>Discount</th>
-              <th style={{textAlign:'right'}}>Delivery Chg</th>
-              <th style={{textAlign:'right'}}>Transport Charges</th>
-              <th style={{textAlign:'right'}}>Tax Amount</th>
-              <th style={{textAlign:'right'}}>Inv Total</th>
+              <th onClick={() => requestSort("BranchSale")}>Branch Sale</th>
+              <th onClick={() => requestSort("InvoiceType")}>Invoice Type</th>
+              <th style={{textAlign:'right'}} onClick={() => requestSort("GrandTotal")}>Grand Total</th>
+              <th style={{textAlign:'right'}} onClick={() => requestSort("PymtAmtRecd")}>Received</th>
+              <th style={{textAlign:'right'}} onClick={() => requestSort("ValueAdded")}>Value Added</th>
+              <th style={{textAlign:'right'}} onClick={() => requestSort("MaterialValue")}>Material Value</th>
+              <th style={{textAlign:'right'}} onClick={() => requestSort("Discount")}>Discount</th>
+              <th style={{textAlign:'right'}} onClick={() => requestSort("Del_Chg")}>Delivery Chg</th>
+              <th style={{textAlign:'right'}} onClick={() => requestSort("TptCharges")}>Transport Charges</th>
+              <th style={{textAlign:'right'}} onClick={() => requestSort("TaxAmount")}>Tax Amount</th>
+              <th style={{textAlign:'right'}} onClick={() => requestSort("InvTotal")}>Inv Total</th>
             </tr>
           </thead>
           <tbody className="tablebody">
-            {getMonthInvReport.map((item, key) => {
+            {sortedData()?.map((item, key) => {
               return (
                 <tr
                   style={{ whiteSpace: "nowrap" }}

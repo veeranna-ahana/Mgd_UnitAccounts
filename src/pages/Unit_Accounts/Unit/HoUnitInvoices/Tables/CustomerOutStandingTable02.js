@@ -49,6 +49,47 @@ export default function CustomerOutStandingTable02({ selectedCustCode, selectedD
      
         return formattedAmount;
     }
+
+
+
+    
+    const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
+    const requestSort = (key) => {
+        let direction = "asc";
+        if (sortConfig.key === key && sortConfig.direction === "asc") {
+          direction = "desc";
+        }
+        setSortConfig({ key, direction });
+      };
+      
+      
+      
+      
+      const sortedData = () => {
+        const dataCopy = [...table2Data];
+      
+        if (sortConfig.key) {
+          dataCopy.sort((a, b) => {
+            let valueA = a[sortConfig.key];
+            let valueB = b[sortConfig.key];
+       
+           
+            if (sortConfig.key === "Receive_Now" ) {
+              valueA = parseFloat(valueA);
+              valueB = parseFloat(valueB);
+            }
+       
+            if (valueA < valueB) {
+              return sortConfig.direction === "asc" ? -1 : 1;
+            }
+            if (valueA > valueB) {
+              return sortConfig.direction === "asc" ? 1 : -1;
+            }
+            return 0;
+          });
+        }
+        return dataCopy;
+      };
    
     return (
 
@@ -57,17 +98,17 @@ export default function CustomerOutStandingTable02({ selectedCustCode, selectedD
             <Table className='table-data border' striped>
                 <thead className='tableHeaderBGColor' style={{ textAlign: "center" }}>
                     <tr style={{ whiteSpace: 'nowrap' }}>
-                        <th>VrRef</th>
-                        <th style={{textAlign:'right'}}>Amount</th>
-                        <th >TxnType</th>
-                        <th >Status</th>
+                        <th onClick={() => requestSort("VrRef")}>VrRef</th>
+                        <th onClick={() => requestSort("Receive_Now")} style={{textAlign:'right'}}>Amount</th>
+                        <th onClick={() => requestSort("TxnType")}>TxnType</th>
+                        <th onClick={() => requestSort("VrStatus")} >Status</th>
                     </tr>
                 </thead>
 
 
                 <tbody className='tablebody' style={{ textAlign: 'center' }}>
                     {
-                        table2Data.map((item, index) => {
+                        sortedData().map((item, index) => {
                             return (
                                 <>
                                     <tr>

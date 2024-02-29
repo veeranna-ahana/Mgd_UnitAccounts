@@ -19,19 +19,7 @@ import { toast } from 'react-toastify';
 export default function TabData() {
 
 
-  // let dummydata = [
-  //   {
-  //   Cust_Code: "Alabama",
-
-  //     population: 4780127,
-
-  //     capital: "Montgomery",
-
-  //     region: "South",
-  //   },
-
-
-  // ];
+  
 
   let [selected, setSelected] = useState("");
   const contentRef = React.useRef();
@@ -60,10 +48,7 @@ export default function TabData() {
   const [selectedDCType, setSelectedDCType] = useState('')
   const [flag, setFlag] = useState('')
 
-  // useEffect(() => {
-  //   getCustomerData();
-  //   getDistinctDCtypes();
-  // }, [selectedCustCode, selectedDCType, flag])
+ 
 
   useEffect(() => {
     getCustomerData();
@@ -189,7 +174,10 @@ console.log("Sum of Balances for each PO_NO:", poSumMap);
         />)
       }
 
-      {pdfOpen && toast.success("PDF is Loading")}
+      {/* {pdfOpen && 
+      
+      toast.success("PDF is Loading")
+    } */}
       <div className='col-md-12'>
         <div className='row'>
           <div className='title '><h4>Unit Invoices List </h4></div>

@@ -3,6 +3,47 @@ import { Table } from "react-bootstrap";
 
 export default function ProdSumaryTable({ getValuesPrdSum }) {
   const [selectRow, setSelectRow] = useState([]);
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
+
+  // sorting function for table headings of the table
+  const requestSort = (key) => {
+    let direction = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") {
+      direction = "desc";
+    }
+    setSortConfig({ key, direction });
+  };
+
+  const sortedData = () => {
+    const dataCopy = [...getValuesPrdSum];
+
+    if (sortConfig.key) {
+      dataCopy.sort((a, b) => {
+        let valueA = a[sortConfig.key];
+        let valueB = b[sortConfig.key];
+
+        // Convert only for the "intiger" columns
+        if (
+          sortConfig.key === "TotalQty" ||
+          sortConfig.key === "TotalValue" ||
+          sortConfig.key === "TotalWeight" ||
+          sortConfig.key === "Ex_Not_no"
+        ) {
+          valueA = parseFloat(valueA);
+          valueB = parseFloat(valueB);
+        }
+
+        if (valueA < valueB) {
+          return sortConfig.direction === "asc" ? -1 : 1;
+        }
+        if (valueA > valueB) {
+          return sortConfig.direction === "asc" ? 1 : -1;
+        }
+        return 0;
+      });
+    }
+    return dataCopy;
+  };
 
   useEffect(() => {
     if (getValuesPrdSum.length > 0) {
@@ -39,16 +80,16 @@ export default function ProdSumaryTable({ getValuesPrdSum }) {
           <thead className="tableHeaderBGColor">
             <tr style={{ whiteSpace: "nowrap" }}>
               <th>withTax</th>
-              <th>Invoice type</th>
+              <th onClick={() => requestSort("InvoiceType")}>Invoice type</th>
               <th>cleared under</th>
-              <th>Material</th>
-              <th>Exise_CL_no</th>
-              <th>TotalQty</th>
-              <th>TotalValue</th>
-              <th>TotalWeight</th>
+              <th onClick={() => requestSort("Material")}>Material</th>
+              <th onClick={() => requestSort("Excise_CL_no")}>Exise_CL_no</th>
+              <th onClick={() => requestSort("TotalQty")}>TotalQty</th>
+              <th onClick={() => requestSort("TotalValue")}>TotalValue</th>
+              <th onClick={() => requestSort("TotalWeight")}>TotalWeight</th>
               <th>ID</th>
               <th>UnitName</th>
-              <th>Ex_Not_no</th>
+              <th onClick={() => requestSort("Ex_Not_no")}>Ex_Not_no</th>
               {/* <th>Material</th>
               <th>Excise_CL_no</th> */}
               <th>ShortNotNo</th>
@@ -56,7 +97,7 @@ export default function ProdSumaryTable({ getValuesPrdSum }) {
           </thead>
 
           <tbody className="tablebody">
-            {getValuesPrdSum.map((item, key) => {
+            {sortedData()?.map((item, key) => {
               return (
                 <tr
                   style={{ whiteSpace: "nowrap" }}

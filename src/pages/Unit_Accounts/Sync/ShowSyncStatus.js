@@ -15,7 +15,7 @@ export default function ShowSyncStatus() {
   const navigate = useNavigate();
   const [unitdata, setunitData] = useState([]);
   const [selectedOption, setSelectedOption] = useState([]);
-  const [getName, setGetName] = useState("");
+  const [getName, setGetName] = useState("Jigani");
   const [getUnitInvoice, setGetUnitInvoice] = useState([]);
   const [getUnitInvoiceForExport, setGetUnitInvoiceForExport] = useState([]);
   const [getHOInvoice, setGetHOInvoice] = useState([]);
@@ -185,9 +185,9 @@ export default function ShowSyncStatus() {
       //   ],
       // });
 
-      const writable = await handle.createWritable();
-      await writable.write(blob);
-      await writable.close();
+      // const writable = await handle.createWritable();
+      // await writable.write(blob);
+      // await writable.close();
 
       // if (
       //   getCustInvoice === 0 &&
@@ -402,7 +402,13 @@ export default function ShowSyncStatus() {
       .catch((err) => {
         console.log("err in table", err);
       });
+
+
+
+      
   };
+
+
 
   useEffect(() => {
     if (getUnitInvoice.length === 1) {
@@ -529,7 +535,7 @@ export default function ShowSyncStatus() {
   let countUnmatched = unmatchedInvoices.length;
 
   // console.log('outside if, unit',state);
-  // console.log("unit invoices", getUnitInvoice);
+  console.log("unit invoices", getUnitInvoice);
   // console.log("invPaymentVrList", invPaymentVrList);
   console.log("HO invoices", getHOInvoice);
   console.log("HO PaymentVrList", invPaymentVrListHO);
@@ -567,7 +573,7 @@ export default function ShowSyncStatus() {
                         : ""
                     }
                     options={unitdata}
-                    placeholder="Select Customer"
+                    placeholder="Select Unit"
                     onChange={handleUnitSelect}
                     selected={selectedOption}
                   />
