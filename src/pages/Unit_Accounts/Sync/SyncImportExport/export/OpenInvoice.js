@@ -4,6 +4,45 @@ import ReactPaginate from "react-paginate";
 
 export default function OpenInvoice({ data }) {
   const [selectRow, setSelectRow] = useState([]);
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
+
+  // sorting function for table headings of the table
+  const requestSort = (key) => {
+    let direction = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") {
+      direction = "desc";
+    }
+    setSortConfig({ key, direction });
+  };
+
+  const sortedData = () => {
+    const dataCopy = [...currentPageData];
+
+    if (sortConfig.key) {
+      dataCopy.sort((a, b) => {
+        let valueA = a[sortConfig.key];
+        let valueB = b[sortConfig.key];
+
+        // Convert only for the "intiger" columns
+        if (
+          sortConfig.key === "GrandTotal" ||
+          sortConfig.key === "PymtAmtRecd"
+        ) {
+          valueA = parseFloat(valueA);
+          valueB = parseFloat(valueB);
+        }
+
+        if (valueA < valueB) {
+          return sortConfig.direction === "asc" ? -1 : 1;
+        }
+        if (valueA > valueB) {
+          return sortConfig.direction === "asc" ? 1 : -1;
+        }
+        return 0;
+      });
+    }
+    return dataCopy;
+  };
 
   //console.log(data)
   const itemsPerPage = 200; // Number of items per page
@@ -54,17 +93,17 @@ export default function OpenInvoice({ data }) {
         <Table striped className="table-data border">
           <thead className="tableHeaderBGColor">
             <tr>
-              <th>Invoice No</th>
-              <th>Date</th>
-              <th>Type</th>
-              <th>Grand Total</th>
-              <th>Balance</th>
-              <th>Customer</th>
+              <th onClick={() => requestSort("Inv_No")}>Invoice No</th>
+              <th onClick={() => requestSort("Inv_Date")}>Date</th>
+              <th onClick={() => requestSort("DC_InvType")}>Type</th>
+              <th onClick={() => requestSort("GrandTotal")}>Grand Total</th>
+              <th onClick={() => requestSort("PymtAmtRecd")}>Balance</th>
+              <th onClick={() => requestSort("Cust_Name")}>Customer</th>
             </tr>
           </thead>
           <tbody className="tablebody">
-            {currentPageData
-              ? currentPageData.map((item, key) => (
+            {sortedData()
+              ? sortedData().map((item, key) => (
                   <tr
                     key={item.DC_Inv_No}
                     style={{ whiteSpace: "nowrap" }}

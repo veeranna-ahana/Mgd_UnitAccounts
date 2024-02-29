@@ -3,6 +3,46 @@ import { Table } from "react-bootstrap";
 
 export default function ClearanceSummary({ getClearanceSummary }) {
   const [selectRow, setSelectRow] = useState([]);
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
+
+   // sorting function for table headings of the table 
+   const requestSort = (key) => {
+    let direction = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") {
+      direction = "desc";
+    }
+    setSortConfig({ key, direction });
+  };
+
+  const sortedData = () => {
+    const dataCopy = [...getClearanceSummary];
+
+    if (sortConfig.key) {
+      dataCopy.sort((a, b) => {
+        let valueA = a[sortConfig.key];
+        let valueB = b[sortConfig.key];
+   
+        // Convert only for the "intiger" columns
+        if (
+         sortConfig.key === "Excise_CL_no" ||
+         sortConfig.key === "TotalQty" || 
+         sortConfig.key === "TotalWeight" || 
+         sortConfig.key === "TotalValue") {
+          valueA = parseFloat(valueA);
+          valueB = parseFloat(valueB);
+        }
+   
+        if (valueA < valueB) {
+          return sortConfig.direction === "asc" ? -1 : 1;
+        }
+        if (valueA > valueB) {
+          return sortConfig.direction === "asc" ? 1 : -1;
+        }
+        return 0;
+      });
+    }
+    return dataCopy;
+  };
 
   const selectedRowFun = (item, index) => {
     let list = { ...item, index: index };
@@ -33,17 +73,17 @@ export default function ClearanceSummary({ getClearanceSummary }) {
           <thead className="tableHeaderBGColor">
             <tr style={{ whiteSpace: "nowrap" }}>
               <th>Tax</th>
-              <th>Invoice Type</th>
+              <th onClick={() => requestSort("InvoiceType")}>Invoice Type</th>
               <th>Under Notification</th>
-              <th>Material</th>
-              <th>Excise Class</th>
-              <th style={{textAlign:'right'}}>Total Qty</th>
-              <th style={{textAlign:'right'}}>Total Value</th>
-              <th style={{textAlign:'right'}}>Total Weight Kg</th>
+              <th onClick={() => requestSort("Material")}>Material</th>
+              <th onClick={() => requestSort("Excise_CL_no")}>Excise Class</th>
+              <th style={{textAlign:'right'}} onClick={() => requestSort("TotalQty")}>Total Qty</th>
+              <th style={{textAlign:'right'}} onClick={() => requestSort("TotalValue")}>Total Value</th>
+              <th style={{textAlign:'right'}} onClick={() => requestSort("TotalWeight")}>Total Weight Kg</th>
             </tr>
           </thead>
           <tbody className="tablebody">
-            {getClearanceSummary?.map((item, key) => {
+            {sortedData()?.map((item, key) => {
               return (
                 <tr
                   style={{ whiteSpace: "nowrap" }}

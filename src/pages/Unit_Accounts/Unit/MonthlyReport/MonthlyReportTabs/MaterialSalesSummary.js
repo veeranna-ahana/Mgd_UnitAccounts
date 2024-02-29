@@ -3,6 +3,46 @@ import { Table } from "react-bootstrap";
 
 export default function MaterialSalesSummary({ getMaterialSummary }) {
   const [selectRow, setSelectRow] = useState([]);
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
+
+  // sorting function for table headings of the table 
+  const requestSort = (key) => {
+    let direction = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") {
+      direction = "desc";
+    }
+    setSortConfig({ key, direction });
+  };
+
+  const sortedData = () => {
+    const dataCopy = [...getMaterialSummary];
+
+    if (sortConfig.key) {
+      dataCopy.sort((a, b) => {
+        let valueA = a[sortConfig.key];
+        let valueB = b[sortConfig.key];
+   
+        // Convert only for the "intiger" columns
+        if (
+         sortConfig.key === "MaterialValue" || 
+         sortConfig.key === "Weight" || 
+         sortConfig.key === "PerKgRate"
+         ) {
+          valueA = parseFloat(valueA);
+          valueB = parseFloat(valueB);
+        }
+   
+        if (valueA < valueB) {
+          return sortConfig.direction === "asc" ? -1 : 1;
+        }
+        if (valueA > valueB) {
+          return sortConfig.direction === "asc" ? 1 : -1;
+        }
+        return 0;
+      });
+    }
+    return dataCopy;
+  };
 
   const selectedRowFun = (item, index) => {
     let list = { ...item, index: index };
@@ -32,15 +72,15 @@ export default function MaterialSalesSummary({ getMaterialSummary }) {
         <Table striped className="table-data border" style={{ border: "1px" }}>
           <thead className="tableHeaderBGColor">
             <tr>
-              <th>Customer</th>
-              <th>Material</th>
-              <th style={{textAlign:'right'}}>Material Value</th>
-              <th style={{textAlign:'right'}}>Weight</th>
-              <th style={{textAlign:'right'}}>Per Kg Rate</th>
+              <th onClick={() => requestSort("Customer")}>Customer</th>
+              <th onClick={() => requestSort("Material")}>Material</th>
+              <th style={{textAlign:'right'}} onClick={() => requestSort("MaterialValue")}>Material Value</th>
+              <th style={{textAlign:'right'}} onClick={() => requestSort("Weight")}>Weight</th>
+              <th style={{textAlign:'right'}} onClick={() => requestSort("PerKgRate")}>Per Kg Rate</th>
             </tr>
           </thead>
           <tbody className="tablebody">
-            {getMaterialSummary?.map((item, key) => {
+            {sortedData()?.map((item, key) => {
               return (
                 <tr
                   style={{ whiteSpace: "nowrap" }}

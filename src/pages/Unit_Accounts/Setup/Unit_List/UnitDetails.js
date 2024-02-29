@@ -35,6 +35,7 @@ export default function UnitDetails() {
 
   const [getUnit, setGetUnit] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
 
   const navigate = useNavigate();
 
@@ -96,7 +97,7 @@ export default function UnitDetails() {
   useEffect(() => {
     if (getUnit.length > 0) {
       //setSelectRow(getUnit[0]);
-      selectedRowFun(getUnit[0],0)
+      selectedRowFun(getUnit[0], 0)
     } else {
       setSelectRow(initial);
     }
@@ -119,37 +120,48 @@ export default function UnitDetails() {
     setState(true);
 
   }
+  console.log("selct row", selectRow.Unit_Address);
+
+
+  const requestSort = (key) => {
+    let direction = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") {
+      direction = "desc";
+    }
+    setSortConfig({ key, direction });
+  };
 
 
 
 
+  const sortedData = () => {
+    const dataCopy = [...getUnit];
+
+    if (sortConfig.key) {
+      dataCopy.sort((a, b) => {
+        let valueA = a[sortConfig.key];
+        let valueB = b[sortConfig.key];
 
 
+        // if (sortConfig.key === "Amount") {
+        //   valueA = parseFloat(valueA);
+        //   valueB = parseFloat(valueB);
+        // }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-console.log("selct row", selectRow.Unit_Address);
-
+        if (valueA < valueB) {
+          return sortConfig.direction === "asc" ? -1 : 1;
+        }
+        if (valueA > valueB) {
+          return sortConfig.direction === "asc" ? 1 : -1;
+        }
+        return 0;
+      });
+    }
+    return dataCopy;
+  };
 
   return (
-    <div>
+    <>
 
 
 
@@ -163,248 +175,269 @@ console.log("selct row", selectRow.Unit_Address);
       <div className="row col-md-12">
         <div className="col-md-4"></div>
         <div className="col-md-4"></div>
-        
+
         <div className="col-md-4">
-          
-            <button
-              className="button-style  group-button"
-              onClick={e => navigate("/UnitAccounts")}
-              style={{ width: "120px", marginLeft:'200px' }}
-            >
-              Close
-            </button>
-        
+
+          <button
+            className="button-style  group-button"
+            onClick={e => navigate("/UnitAccounts")}
+            style={{ width: "120px", marginLeft: '200px' }}
+          >
+            Close
+          </button>
+
         </div>
       </div>
 
-      
+
 
       <hr style={{ backgroundColor: "black", height: "3px", }}
       />
 
-      <div className="row">
-        <div className="col-md-4 mt-2 col-sm-12">
-          <div
-            style={{
+      <div className="row"  >
 
-              height: "350px",
-              overflowX: "scroll",
-              overflowY: "scroll",
+        <div className="col-md-4 mt-2 col-sm-12"
+          style={{
 
-            }}
+            height: "380px",
+            overflowX: "scroll",
+            overflowY: "scroll",
+
+          }}
+        >
+          <Table
+            striped
+            className="table-data border"
+            style={{ marginLeft: "5px", border: "1px" }}
           >
-            <Table
-              striped
-              className="table-data border"
-              style={{ marginLeft: "5px", border: "1px" }}
-            >
-              <thead className="tableHeaderBGColor">
-                <tr style={{ whiteSpace: "nowrap" }}>
-                  <th >Unit Id</th>
-                  <th >Unit Name</th>
-                  <th>Unit_Address</th>
+            <thead className="tableHeaderBGColor">
+              <tr style={{ whiteSpace: "nowrap" }}>
+                <th onClick={() => requestSort("UnitID")} >Unit Id</th>
+                <th
+                  onClick={() => requestSort("UnitName")}
+                >Unit Name</th>
+                {/* <th>Unit_Address</th>
                   <th>Place</th>
                   <th>State</th>
-                  <th>Country</th>
+                  <th>Country</th> */}
 
 
-                </tr>
-              </thead>
-              <tbody className="tablebody">
+              </tr>
+            </thead>
+            <tbody className="tablebody">
 
-                {
-                  getUnit.map((item, key) => {
-                    return (
-                      <>
-                        <tr onClick={() => selectedRowFun(item, key)}
-                          style={{ whiteSpace: "nowrap" }}
-                          className={key === selectRow?.index ? 'selcted-row-clr' : ''}
-                        >
+              {
+                sortedData().map((item, key) => {
+                  return (
+                    <>
+                      <tr onClick={() => selectedRowFun(item, key)}
+                        style={{ whiteSpace: "nowrap" }}
+                        className={key === selectRow?.index ? 'selcted-row-clr' : ''}
+                      >
 
-                          <td>{item.UnitID} </td>
-                          <td>{item.UnitName} </td>
-                          <td>{item.Unit_Address}</td>
+                        <td>{item.UnitID} </td>
+                        <td>{item.UnitName} </td>
+                        {/* <td>{item.Unit_Address}</td>
                           <td>{item.Place}</td>
                           <td>{item.State}</td>
-                          <td>{item.Country}</td>
-                        </tr>
+                          <td>{item.Country}</td> */}
+                      </tr>
 
-                      </>
-                    )
-                  })
-                }
+                    </>
+                  )
+                })
+              }
 
-              </tbody>
-            </Table>
-          </div>
+            </tbody>
+          </Table>
         </div>
+
+
         <div className="col-md-8 col-sm-12">
 
 
+          <div className="row col-md-12" style={{ padding: '0px' }}>
+            <div className='d-flex col-md-6 '>
+              <label className='form-label col-md-5  ' style={{ whiteSpace: 'nowrap' }}>Unit Id<span style={{ color: 'red' }}>*</span></label>
+              <input class="form-control  col-md-6 " type="text" name='UnitID' id='UnitID' required
 
 
-          <form ref={formRef}>
+                value={selectRow?.UnitID}
+                disabled
+              />
+            </div>
 
-            <div className='row col-md-12 ip-box form-bg mt-2' style={{ overflowY: 'scroll', height: '400px' }}>
-              <div className='col-md-6' >
-                <div className=' col-md-12 '>
-                  <label className='form-label col-md-6  ' style={{ whiteSpace: 'nowrap' }}>Unit Id<span style={{ color: 'red' }}>*</span></label>
-                  <input class="form-control " type="text" name='UnitID' id='UnitID' required
+            <div className='d-flex col-md-6 '>
+              <label className='form-label col-md-6  ' style={{ whiteSpace: 'nowrap' }}>GST No</label>
+              <input class="form-control col-md-6  " type="text" placeholder=" " name='Unit_GSTNo'
+                maxLength={15} style={{marginLeft:'20px'}}
+                disabled
+                value={selectRow.Unit_GSTNo}
 
-
-                    value={selectRow?.UnitID}
-                    disabled
-                  />
-                </div>
-
-                <div className=' col-md-12 '>
-                  <label className='form-label col-md-6  '>Unit Name<span style={{ color: 'red' }}>*</span></label>
-                  <input class="form-control  " type="text" placeholder=" " name='UnitName' id='UnitName' disabled
-
-
-
-                    value={selectRow?.UnitName}
-                  />
-                </div>
-
-                <div className=" col-md-12">
-
-                  <label className="form-label ms-3">Unit Address</label>
-
-                  <textarea className="form-control sticky-top"  name='Unit_Address'
-                    style={{ height: '143px', resize: 'none' }}
-                    disabled
-                    value={selectRow.Unit_Address === null ? '' :selectRow.Unit_Address }
-                  >
-                  </textarea>
-
-                </div>
-
-
-
-                <div className=' d-flex col-md-12 ' style={{ gap: '30px' }}>
-                  <div className='col-md-6'>
-                    <label className='form-label'>Place</label>
-                    <input class="form-control" type="text" placeholder=" " name='Place'
-                      disabled
-                      value={selectRow.Place || postData.Place}
-                    />
-                  </div>
-                  <div className='col-md-5'>
-                    <label className='form-label'>PIN</label>
-                    <input class=" form-control " type="text" placeholder=" " name='PIN'
-                      disabled
-                      maxLength={6}
-                      value={selectRow.PIN || postData.PIN}
-
-                    />
-
-                  </div>
-
-                </div>
-
-
-                <div className="col-md-12">
-                  <label className="form-label ms-3"> State</label>
-                  <input class=" form-control " type="text" placeholder=" " name='State'
-                    disabled
-
-                    value={selectRow.State}
-
-                  />
-
-                </div>
-
-
-
-
-                <div className=' col-md-12 '>
-                  <label className='form-label col-md-6  '>Country</label>
-                  <input class="form-control  " type="text" placeholder=" " name='Country'
-
-                    disabled
-                    value={selectRow.Country}
-                  />
-                </div>
-
-
-
-
-
-                <div className=" col-md-12">
-
-                  <label className="form-label ms-3">Contact details</label>
-
-                  <textarea className="form-control sticky-top" rows='2' id="" name='Unit_contactDetails'
-
-                    value={selectRow.Unit_contactDetails}
-                    disabled
-                    style={{ height: '143px', resize: 'none' }}
-
-                  ></textarea>
-
-                </div>
-              </div>
-
-
-
-              <div className='col-md-6'>
-                <div className=' col-md-12 '>
-                  <label className='form-label col-md-6  ' style={{ whiteSpace: 'nowrap' }}>GST No</label>
-                  <input class="form-control " type="text" placeholder=" " name='Unit_GSTNo'
-                    maxLength={15}
-                    disabled
-                    value={selectRow.Unit_GSTNo}
-
-                  />
-
-                </div>
-
-                <div className=' col-md-12 '>
-                  <label className='form-label col-md-6  ' style={{ whiteSpace: 'nowrap' }}>Tally Account Name</label>
-                  <input class=" form-control " type="text" placeholder=" " name='Tally_account_Name'
-                    disabled
-                    value={selectRow.Tally_account_Name}
-                  />
-                </div>
-
-
-
-                <div className=' col-md-12 '>
-                  <label className='form-label col-md-6  '>Mail Id</label>
-                  <input class=" form-control " type="email" placeholder=" " name='Mail_Id'
-                    disabled
-                    value={selectRow.Mail_Id}
-                  />
-                </div>
-                <div className=' col-md-12 '>
-                  <label className='form-label col-md-6  '>Unit Initials</label>
-                  <input class="form-control  " type="text" placeholder=" " name='UnitIntial'
-                    disabled
-                    value={selectRow.UnitIntial}
-                  />
-                </div>
-
-
-
-                <div className=' row col-md-12 mt-1'>
-                  <label className="form-label col-md-2">Current</label>
-                  <input className="mt-3 col-md-3 ms-4  custom-checkbox" type="checkbox" name='Current'
-                    id="flexCheckDefault"
-                    checked={selectRow.Current === 1 ? true : false || postData.Current === 1 ? true : false}
-
-                  />
-                </div>
-              </div>
-
+              />
 
             </div>
 
 
-          </form>
+          </div>
+
+          <div className="row col-md-12 mt-1" style={{ padding: '0px' }}>
+            <div className=' d-flex col-md-6 '>
+              <label className='form-label col-md-5  ' >Unit Name<span style={{ color: 'red' }}>*</span></label>
+              <input class="form-control col-md-6 " type="text" placeholder=" " name='UnitName' id='UnitName' disabled
+
+
+
+                value={selectRow?.UnitName}
+              />
+            </div>
+
+
+            <div className='d-flex col-md-6 '>
+              <label className=' col-md-6 form-label '
+                style={{ whiteSpace: 'nowrap' }}
+              > Tally Account Name</label>
+              <input className=" form-control col-md-6 " type="text" placeholder=" " name='Tally_account_Name'
+                disabled style={{marginLeft:'20px'}}
+                value={selectRow.Tally_account_Name}
+              />
+            </div>
+          </div>
+
+
+          <div className="row col-md-12 mt-1" style={{ padding: '0px' }}>
+
+
+            <div className='d-flex col-md-6 '>
+
+              <label className='form-label col-md-5  '>Mail Id</label>
+              <input class=" form-control col-md-6" type="email" placeholder=" " name='Mail_Id'
+                disabled
+                value={selectRow.Mail_Id}
+              />
+
+
+            </div>
+
+            <div className='d-flex col-md-6 '>
+              <label className='form-label col-md-6  '>Unit Initials</label>
+              <input class="form-control col-md-6  " type="text" placeholder=" " name='UnitIntial'
+                disabled style={{marginLeft:'20px'}}
+                value={selectRow.UnitIntial}
+              />
+            </div>
+
+
+          </div>
+
+
+          <div className=' row col-md-12 mt-1' style={{ padding: '0px' }} >
+            <div className='d-flex col-md-6'>
+              <label className='form-label col-md-5  '>Place</label>
+              <input class="form-control col-md-6" type="text" placeholder=" " name='Place'
+                disabled
+                value={selectRow.Place || postData.Place}
+              />
+            </div>
+
+            <div className=" d-flex col-md-6">
+              <label className="form-label col-md-6  "> State</label>
+              <input class=" form-control col-md-6 " type="text" placeholder=" " name='State'
+                disabled style={{marginLeft:'20px'}}
+
+                value={selectRow.State}
+
+              />
+
+            </div>
+
+
+
+
+
+          </div>
+
+
+
+          <div className="row col-md-12 mt-1" style={{ padding: '0px' }}>
+
+
+            <div className='d-flex col-md-6'>
+              <label className='form-label col-md-5  '>PIN</label>
+              <input class=" form-control col-md-6 " type="text" placeholder=" " name='PIN'
+                disabled
+                maxLength={6}
+                value={selectRow.PIN || postData.PIN}
+
+              />
+
+            </div>
+
+            <div className=' row col-md-6 mt-1'>
+              <label className="form-label col-md-4">Current</label>
+              <input className="mt-3 col-md-3 ms-5  custom-checkbox" type="checkbox" name='Current'
+                id="flexCheckDefault"
+                checked={selectRow.Current === 1 ? true : false || postData.Current === 1 ? true : false}
+
+              />
+            </div>
+
+
+          </div>
+
+
+          <div className="row col-md-12 mt-1" style={{ padding: '0px' }}>
+            <div className=" d-flex col-md-6">
+
+              <label className="form-label col-md-5" style={{whiteSpace:'nowrap'}}>Unit Address</label>
+
+              <textarea className="form-control sticky-top col-md-6 " name='Unit_Address' rows='2'
+                style={{ height: '80px', resize: 'none' }}
+                disabled
+                value={selectRow.Unit_Address === null ? '' : selectRow.Unit_Address}
+              >
+              </textarea>
+
+            </div>
+
+            <div className=" d-flex col-md-6 mt-1 ">
+
+              <label className="form-label  col-md-6 " style={{ whiteSpace: 'nowrap' }}>Contact details</label>
+
+              <textarea className="form-control sticky-top" rows='2' id="" name='Unit_contactDetails'
+
+                value={selectRow.Unit_contactDetails}
+                disabled
+                style={{ height: '80px', resize: 'none', marginLeft:'20px' }}
+
+              ></textarea>
+
+            </div>
+
+
+
+
+          </div>
+
+
+
+          <div className='d-flex col-md-6 ' >
+            <label className='form-label col-md-5  '>Country</label>
+            <input class="form-control  col-md-6 " type="text" placeholder=" " name='Country'
+
+              disabled
+              value={selectRow.Country}
+            />
+          </div>
+
+
+
+
+
+
         </div>
       </div>
-    </div>
+    </>
   );
 }
 

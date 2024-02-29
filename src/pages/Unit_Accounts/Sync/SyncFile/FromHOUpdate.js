@@ -4,6 +4,7 @@ import { baseURL } from "../../../../api/baseUrl";
 import axios from "axios";
 import { toast } from "react-toastify";
 import Spinner from "./Spinner";
+import { useNavigate } from "react-router-dom";
 
 export default function FromHOUpdate() {
   const fileInputRef = useRef(null);
@@ -15,6 +16,8 @@ export default function FromHOUpdate() {
     open_inv: [],
     open_rec: [],
   });
+
+  const navigate = useNavigate();
 
   const handleButtonClick = () => {
     fileInputRef.current.click();
@@ -156,7 +159,8 @@ export default function FromHOUpdate() {
           <h4 className="title">From HO Update</h4>
         </div>
       </div>
-      <div className="col-md-12">
+      <div className="d-flex col-md-12">
+        <div>
         <button
           className={`button-style mt-2 group-button ${
             isLoading ? "loading" : ""
@@ -173,6 +177,16 @@ export default function FromHOUpdate() {
           style={{ display: "none" }}
           onChange={handleFileSelect}
         />
+        </div>
+        <div className="" style={{marginLeft:'70%'}}>
+          <button
+            className="button-style mt-2 group-button"
+            type="button"
+            onClick={(e) => navigate("/UnitAccounts")}
+          >
+            Close
+          </button>
+        </div>
       </div>
       {isLoading && <Spinner />}
     </>

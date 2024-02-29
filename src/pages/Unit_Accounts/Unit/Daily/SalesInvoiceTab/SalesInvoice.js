@@ -15,9 +15,90 @@ export default function SalesInvoice({ getValuesSales, date }) {
   const [getValuesClearance, setGetValuesClearance] = useState([]);
   const [selectValues, setSelectValues] = useState([]);
   const [Keys123, setKeys123123] = React.useState(false);
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
+  const [sortConfigDetails, setSortConfigDetails] = useState({ key: null, direction: null });
 
   const [lastToastTimestamp, setLastToastTimestamp] = useState(0);
   const cooldownDuration = 6000;
+
+
+// sorting function for table headings of the table first
+  const requestSort = (key) => {
+    let direction = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") {
+      direction = "desc";
+    }
+    setSortConfig({ key, direction });
+  };
+
+  const sortedData = () => {
+    const dataCopy = [...getValuesSales];
+
+    if (sortConfig.key) {
+      dataCopy.sort((a, b) => {
+        let valueA = a[sortConfig.key];
+        let valueB = b[sortConfig.key];
+   
+        // Convert only for the "intiger" columns
+        if (sortConfig.key === "Net_Total" || sortConfig.key === "TaxAmount" || sortConfig.key === "GrandTotal") {
+          valueA = parseFloat(valueA);
+          valueB = parseFloat(valueB);
+        }
+   
+        if (valueA < valueB) {
+          return sortConfig.direction === "asc" ? -1 : 1;
+        }
+        if (valueA > valueB) {
+          return sortConfig.direction === "asc" ? 1 : -1;
+        }
+        return 0;
+      });
+    }
+    return dataCopy;
+  };
+
+// sorting function for table headings of the table second
+const requestSortDetails = (key) => {
+  let direction = "asc";
+  if (sortConfigDetails.key === key && sortConfigDetails.direction === "asc") {
+    direction = "desc";
+  }
+  setSortConfigDetails({ key, direction });
+};
+
+const sortedDataDetails = () => {
+  const dataCopy = [...getValuesSalesDe];
+
+  if (sortConfigDetails.key) {
+    dataCopy.sort((a, b) => {
+      let valueA = a[sortConfigDetails.key];
+      let valueB = b[sortConfigDetails.key];
+ 
+      // Convert only for the "integer" columns
+      if (
+       sortConfigDetails.key === "TaxAmt" || 
+       sortConfigDetails.key === "TaxPercent" || 
+       sortConfigDetails.key === "TaxableAmount" ||
+       sortConfigDetails.key === "dc_invTaxId" ||
+       sortConfigDetails.key === "Dc_inv_No" ||
+       sortConfigDetails.key === "DcTaxID" ||
+       sortConfigDetails.key === "Unit_UId") {
+        valueA = parseFloat(valueA);
+        valueB = parseFloat(valueB);
+      }
+ 
+      if (valueA < valueB) {
+        return sortConfigDetails.direction === "asc" ? -1 : 1;
+      }
+      if (valueA > valueB) {
+        return sortConfigDetails.direction === "asc" ? 1 : -1;
+      }
+      return 0;
+    });
+  }
+  return dataCopy;
+};
+
 
   useEffect(() => {
     if (getValuesSales.length > 0) {
@@ -119,18 +200,18 @@ export default function SalesInvoice({ getValuesSales, date }) {
         <Table striped className="table-data border">
           <thead className="tableHeaderBGColor">
             <tr style={{ whiteSpace: "nowrap" }}>
-              <th>Type</th>
-              <th>Invoice no</th>
-              <th>Name</th>
-              <th style={{ textAlign: "right" }}>Net Total</th>
-              <th style={{ textAlign: "right" }}>Tax amount</th>
-              <th style={{ textAlign: "right" }}>Grand Total</th>
-              <th>DC Status</th>
+              <th onClick={() => requestSort("DC_InvType")}>Type</th>
+              <th onClick={() => requestSort("Inv_No")}>Invoice no</th>
+              <th onClick={() => requestSort("Cust_Name")}>Name</th>
+              <th style={{ textAlign: "right" }} onClick={() => requestSort("Net_Total")}>Net Total</th>
+              <th style={{ textAlign: "right" }} onClick={() => requestSort("TaxAmount")}>Tax amount</th>
+              <th style={{ textAlign: "right" }} onClick={() => requestSort("GrandTotal")}>Grand Total</th>
+              <th onClick={() => requestSort("DCStatus")}>DC Status</th>
             </tr>
           </thead>
 
           <tbody className="tablebody">
-            {getValuesSales?.map((item, key) => {
+            {sortedData()?.map((item, key) => {
               return (
                 <tr
                   style={{
@@ -175,31 +256,31 @@ export default function SalesInvoice({ getValuesSales, date }) {
         <Table striped className="table-data border">
           <thead className="tableHeaderBGColor">
             <tr style={{ whiteSpace: "nowrap" }}>
-              <th>Tax Name</th>
-              <th>Taxable amount</th>
-              <th>Tax %</th>
-              <th>Tax amount</th>
-              <th>AcctHead</th>
+              <th onClick={() => requestSortDetails("Tax_Name")}>Tax Name</th>
+              <th onClick={() => requestSortDetails("TaxableAmount")}>Taxable amount</th>
+              <th onClick={() => requestSortDetails("TaxPercent")}>Tax %</th>
+              <th onClick={() => requestSortDetails("TaxAmt")}>Tax amount</th>
+              <th onClick={() => requestSortDetails("AcctHead")}>AcctHead</th>
               <th>InvTax Id</th>
               <th>Sync_Hold</th>
-              <th>Unit_Uid</th>
+              <th onClick={() => requestSortDetails("Unit_UId")}>Unit_Uid</th>
               <th>Updated</th>
-              <th>UnitName</th>
-              <th>dc_nv_Taxid</th>
-              <th>Dc_inv_No</th>
-              <th>DcTaxId</th>
+              <th onClick={() => requestSortDetails("UnitName")}>UnitName</th>
+              <th onClick={() => requestSortDetails("dc_invTaxId")}>dc_nv_Taxid</th>
+              <th onClick={() => requestSortDetails("Dc_inv_No")}>Dc_inv_No</th>
+              <th onClick={() => requestSortDetails("DcTaxID")}>DcTaxId</th>
               <th>TaxId</th>
               <th>TaxOn</th>
               {/* <th>TaxPercent</th>
               <th>TaxAmt</th> */}
               <th>ToWords</th>
-              <th> InvType</th>
+              <th onClick={() => requestSortDetails("InvType")}> InvType</th>
               <th>InvId</th>
             </tr>
           </thead>
 
           <tbody className="tablebody">
-            {getValuesSalesDe?.map((item, key) => {
+            {sortedDataDetails()?.map((item, key) => {
               const taxPercent = parseFloat(item.TaxPercent);
               const formattedTaxPercent =
                 taxPercent % 1 !== 0

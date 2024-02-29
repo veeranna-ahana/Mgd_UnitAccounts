@@ -31,26 +31,64 @@ export default function UnitOutStanding() {
 
         return formattedAmount;
     }
+
+    const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
+    const requestSort = (key) => {
+        let direction = "asc";
+        if (sortConfig.key === key && sortConfig.direction === "asc") {
+          direction = "desc";
+        }
+        setSortConfig({ key, direction });
+      };
+      
+      
+      
+      
+      const sortedData = () => {
+        const dataCopy = [...unitOutstandingData];
+      
+        if (sortConfig.key) {
+          dataCopy.sort((a, b) => {
+            let valueA = a[sortConfig.key];
+            let valueB = b[sortConfig.key];
+       
+           
+            if (sortConfig.key === "Cust_Code" || sortConfig.key === "OutStandingAmount" || sortConfig.key === "OutStandingInvoiceCount" ) {
+              valueA = parseFloat(valueA);
+              valueB = parseFloat(valueB);
+            }
+       
+            if (valueA < valueB) {
+              return sortConfig.direction === "asc" ? -1 : 1;
+            }
+            if (valueA > valueB) {
+              return sortConfig.direction === "asc" ? 1 : -1;
+            }
+            return 0;
+          });
+        }
+        return dataCopy;
+      };
     return (
 
 
         <div className='mt-1 col-md-12' style={{ height: "250px", overflowY: "scroll", overflowX: 'scroll' }}>
             <Table className='table-data border' striped>
                 <thead className='tableHeaderBGColor' >
-                    <tr>
-                        <th>UnitName</th>
-                        <th>Cust_Code</th>
-                        <th>Cust_Name</th>
-                        <th>Branch</th>
-                        <th style={{textAlign:'right'}}>Out_Standing_Amount</th>
-                        <th>InvoiceCount</th>
+                    <tr >
+                        <th onClick={() => requestSort("UnitName")}>UnitName</th>
+                        <th onClick={() => requestSort("Cust_Code")}>Cust_Code</th>
+                        <th onClick={() => requestSort("Cust_name")}>Cust_Name</th>
+                        <th onClick={() => requestSort("Branch")}>Branch</th>
+                        <th  onClick={() => requestSort("OutStandingAmount")} style={{textAlign:'right'}}>Out_Standing_Amount</th>
+                        <th onClick={() => requestSort("OutStandingInvoiceCount")}>InvoiceCount</th>
                     </tr>
                 </thead>
 
 
                 <tbody className='tablebody'>
                     {
-                        unitOutstandingData.map((item, i) => {
+                        sortedData().map((item, i) => {
                             return (
                                 <>
                                     <tr>

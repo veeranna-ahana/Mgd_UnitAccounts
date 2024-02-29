@@ -109,6 +109,45 @@ export default function Closed() {
 
     setFilteredData(filtered);
   }
+
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
+
+  const requestSort = (key) => {
+    let direction = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") {
+      direction = "desc";
+    }
+    setSortConfig({ key, direction });
+  };
+
+
+
+
+  const sortedData = () => {
+    const dataCopy = [...currentPageData];
+
+    if (sortConfig.key) {
+      dataCopy.sort((a, b) => {
+        let valueA = a[sortConfig.key];
+        let valueB = b[sortConfig.key];
+
+
+        if (sortConfig.key === "Amount" || sortConfig.key === "On_account") {
+          valueA = parseFloat(valueA);
+          valueB = parseFloat(valueB);
+        }
+
+        if (valueA < valueB) {
+          return sortConfig.direction === "asc" ? -1 : 1;
+        }
+        if (valueA > valueB) {
+          return sortConfig.direction === "asc" ? 1 : -1;
+        }
+        return 0;
+      });
+    }
+    return dataCopy;
+  };
   return (
     <div>
       <div className="col-md-12">
@@ -129,7 +168,7 @@ export default function Closed() {
         <div className="col-md-2  ">
           <label className="form-label">Search</label>
           <input
-            class=""
+             placeholder="RV_NO/Txn_Type"
             type="text"
             onChange={handleSearch}
             value={searchInput}
@@ -187,17 +226,17 @@ export default function Closed() {
         >
           <thead className="tableHeaderBGColor">
             <tr style={{ whiteSpace: 'nowrap' }}>
-              <th>Receipt Vr No</th>
-              <th>Date</th>
-              <th>Customer</th>
-              <th>Transaction Type</th>
-              <th>Amount</th>
-              <th>On Account</th>
-              <th>Description</th>
+              <th onClick={() => requestSort("Recd_PVNo")}>Receipt Vr No</th>
+              <th onClick={() => requestSort("Recd_PV_Date")}>Date</th>
+              <th onClick={() => requestSort("CustName")}>Customer</th>
+              <th onClick={() => requestSort("TxnType")}>Transaction Type</th>
+              <th onClick={() => requestSort("Amount")} >Amount</th>
+              <th onClick={() => requestSort("On_account")}>On Account</th>
+              <th onClick={() => requestSort("Description")}>Description</th>
             </tr>
           </thead>
           <tbody className="tablebody">
-            {currentPageData ? currentPageData.map((rv, key) => (
+            {sortedData() ? sortedData().map((rv, key) => (
               <tr
                 // onClick={() => handleNavigate(rv.Id)} className="row-button" key={rv.Id}
                 style={{ whiteSpace: 'nowrap' }}

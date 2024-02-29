@@ -7,6 +7,47 @@ import { useNavigate } from "react-router-dom";
 export default function InvoicesList() {
   const [selectRow, setSelectRow] = useState([]);
   const [getCancelInvoices, setGetCancelInvoices] = useState([]);
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
+
+   // sorting function for table headings of the table
+   const requestSort = (key) => {
+    let direction = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") {
+      direction = "desc";
+    }
+    setSortConfig({ key, direction });
+  };
+
+  const sortedData = () => {
+    const dataCopy = [...getCancelInvoices];
+
+    if (sortConfig.key) {
+      dataCopy.sort((a, b) => {
+        let valueA = a[sortConfig.key];
+        let valueB = b[sortConfig.key];
+
+        // Convert only for the "intiger" columns
+        if (
+          sortConfig.key === "VrAmount" ||
+          sortConfig.key === "TaxPercent" ||
+          sortConfig.key === "TaxAmount" ||
+          sortConfig.key === "TaxableAmount"
+        ) {
+          valueA = parseFloat(valueA);
+          valueB = parseFloat(valueB);
+        }
+
+        if (valueA < valueB) {
+          return sortConfig.direction === "asc" ? -1 : 1;
+        }
+        if (valueA > valueB) {
+          return sortConfig.direction === "asc" ? 1 : -1;
+        }
+        return 0;
+      });
+    }
+    return dataCopy;
+  };
 
   const navigate = useNavigate();
 
@@ -63,7 +104,7 @@ export default function InvoicesList() {
     <>
       <div className="col-md-12">
         <div className="row">
-          <h4 className="title">Canceled Voucher List</h4>
+          <h4 className="title">Cancelled Voucher List</h4>
         </div>
       </div>
       <div className="row col-md-12 mt-4">
@@ -78,19 +119,19 @@ export default function InvoicesList() {
           <Table striped className="table-data border">
             <thead className="tableHeaderBGColor">
               <tr style={{ whiteSpace: "nowrap" }}>
-                <th>CancelVrNo</th>
-                <th>VrDate</th>
-                <th>VrAmount</th>
-                <th>CancelReason</th>
-                <th>RefVrNo</th>
-                <th>RefVrDate</th>
-                <th>Cust_Code</th>
-                <th>Cust_Name</th>
+                <th onClick={() => requestSort("CancelVrNo")}>CancelVrNo</th>
+                <th onClick={() => requestSort("VrDate")}>VrDate</th>
+                <th onClick={() => requestSort("VrAmount")}>VrAmount</th>
+                <th onClick={() => requestSort("CancelReason")}>CancelReason</th>
+                <th onClick={() => requestSort("RefVrNo")}>RefVrNo</th>
+                <th onClick={() => requestSort("RefVrDate")}>RefVrDate</th>
+                <th onClick={() => requestSort("Cust_Code")}>Cust_Code</th>
+                <th onClick={() => requestSort("Cust_Name")}>Cust_Name</th>
               </tr>
             </thead>
 
             <tbody className="tablebody">
-              {getCancelInvoices.map((item, key) => {
+              {sortedData()?.map((item, key) => {
                 return (
                   <tr
                     style={{ whiteSpace: "nowrap" }}

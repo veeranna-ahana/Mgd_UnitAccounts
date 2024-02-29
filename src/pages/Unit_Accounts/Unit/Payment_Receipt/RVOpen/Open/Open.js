@@ -113,6 +113,44 @@ export default function Open() {
     setFilteredData(filtered);
   }
 
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
+
+  const requestSort = (key) => {
+    let direction = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") {
+      direction = "desc";
+    }
+    setSortConfig({ key, direction });
+  };
+
+
+
+
+  const sortedData = () => {
+    const dataCopy = [...currentPageData];
+
+    if (sortConfig.key) {
+      dataCopy.sort((a, b) => {
+        let valueA = a[sortConfig.key];
+        let valueB = b[sortConfig.key];
+
+
+        if (sortConfig.key === "Amount" || sortConfig.key === "On_account") {
+          valueA = parseFloat(valueA);
+          valueB = parseFloat(valueB);
+        }
+
+        if (valueA < valueB) {
+          return sortConfig.direction === "asc" ? -1 : 1;
+        }
+        if (valueA > valueB) {
+          return sortConfig.direction === "asc" ? 1 : -1;
+        }
+        return 0;
+      });
+    }
+    return dataCopy;
+  };
   
 
   return (
@@ -132,7 +170,7 @@ export default function Open() {
             <div className="col-md-2  ">
               <label className="form-label">Search</label>
               <input
-                class=""
+                placeholder="RV_NO/Txn_Type"
                 type="text"
                 onChange={handleSearch}
                 value={searchInput}
@@ -185,18 +223,18 @@ export default function Open() {
       <div style={{ height: "400px", overflowY: "scroll", marginTop: "20px" }}>
         <Table striped className="table-data border" style={{ marginLeft: "5px", border: "1px" }}>
           <thead className="tableHeaderBGColor">
-            <tr>
-              <th style={{ whiteSpace: 'nowrap' }}>Receipt Vr No</th>
-              <th>Date</th>
-              <th>Customer</th>
-              <th style={{ whiteSpace: 'nowrap' }}>Transaction Type</th>
-              <th>Amount</th>
-              <th style={{ whiteSpace: 'nowrap' }}>On Account</th>
-              <th>Description</th>
+            <tr style={{ whiteSpace: 'nowrap' }}>
+            <th onClick={() => requestSort("Recd_PVNo")}>Receipt Vr No</th>
+              <th onClick={() => requestSort("Recd_PV_Date")}>Date</th>
+              <th onClick={() => requestSort("CustName")}>Customer</th>
+              <th onClick={() => requestSort("TxnType")}>Transaction Type</th>
+              <th onClick={() => requestSort("Amount")} style={{ textAlign: 'right' }}>Amount</th>
+              <th onClick={() => requestSort("On_account")}>On Account</th>
+              <th onClick={() => requestSort("Description")}>Description</th>
             </tr>
           </thead>
           <tbody className="tablebody">
-            {currentPageData ? currentPageData.map((rv, key) => (
+            {sortedData() ? sortedData().map((rv, key) => (
               <tr
                 // onClick={() => handleNavigate(rv.Id)} className="row-button" key={rv.Id}
                 style={{ whiteSpace: 'nowrap' }}

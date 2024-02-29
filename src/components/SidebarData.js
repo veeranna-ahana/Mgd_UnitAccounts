@@ -222,8 +222,21 @@ export const customerSidebar = [
         icon: <FontAwesomeIcon icon={faBoltLightning} />,
         path: "/UnitAccounts/Sync/ShowSyncStatus",
       },
+      {
+        title: "Send mail",
+        icon: <FontAwesomeIcon icon={faBoltLightning} />,
+        path: "/UnitAccounts/Sync/send",
+      },
     ],
   },
+
+
+  {
+    title: "Send mail",
+    icon: <FontAwesomeIcon icon={faBoltLightning} />,
+    path: "/UnitAccounts/Sync/send",
+  },
+
 ];
 
 export const adminSidebar = [

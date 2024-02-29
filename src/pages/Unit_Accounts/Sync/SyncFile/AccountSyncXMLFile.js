@@ -3,6 +3,7 @@ import axios from "axios";
 import { xml2js, js2xml } from "xml-js";
 import { baseURL } from "../../../../api/baseUrl";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 // import SendMail from "../sendMail/SendMail";
 
 export default function AccountSyncXMLFile() {
@@ -13,6 +14,8 @@ export default function AccountSyncXMLFile() {
   const [getPaymentReceipts, setGetPaymentReceipts] = useState([]);
   const [getPaymentAdjusted, setGetPaymentAdjusted] = useState([]);
   const [getCancelledUnit, setGetCancelledUnit] = useState([]);
+
+  const navigate = useNavigate();
 
   const arrayToXML = (data) => {
     const custInvoiceData = data.getCustInvoice || [];
@@ -441,13 +444,24 @@ export default function AccountSyncXMLFile() {
           <h4 className="title">From Accounts Sync File</h4>
         </div>
       </div>
-      <div className="col-md-12">
+      <div className="d-flex col-md-12">
+        <div className="">
         <button
           className="button-style mt-2 group-button"
           onClick={handleDownload}
         >
           Account Sync File
         </button>
+        </div>
+        <div className="" style={{marginLeft:'70%'}}>
+          <button
+            className="button-style mt-2 group-button"
+            type="button"
+            onClick={(e) => navigate("/UnitAccounts")}
+          >
+            Close
+          </button>
+        </div>
       </div>
     </>
   );

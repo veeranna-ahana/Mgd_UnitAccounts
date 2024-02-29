@@ -34,6 +34,7 @@ import FromHoSync from "./pages/Unit_Accounts/Sync/SyncFile/FromHoSync";
 import Create_New from "./pages/Unit_Accounts/Unit/Payment_Receipt/Create New/Reports/components/Create_New";
 import InvoicesListjs from "./pages/Unit_Accounts/Invoices/CancelledVrList/InvoicesList";
 import InvoicesList from "./pages/Unit_Accounts/Invoices/CancelledVrList/InvoicesList";
+import SendMail from "./pages/sendmail/sendmails";
 
 function App() {
   return (
@@ -78,7 +79,9 @@ function App() {
               <Route path="fromHoSync" element={<FromHoSync />} />
               <Route path="HOupdateSync" element={<FromHOUpdate />} />
               <Route path="SyncExport" element={<Sync />} />
-              <Route path="ShowSyncStatus" element={<SyncCall />} />
+              {/* <Route path="ShowSyncStatus" element={<SyncCall />} /> */}
+              <Route path="ShowSyncStatus" element={<SendMail />} />
+              {/* <Route path="send" element={<SendMail/>} /> */}
             </Route>
           </Route>
         </Route>

@@ -183,6 +183,11 @@ code {
   font-weight: 700;
 }
 
+/* .form-label {
+  font-size: 12px;
+  font-weight: 700;
+} */
+
 .rbt-input-main .form-control .rbt-input {
   padding: 0px !important;
   margin: 0px !important;

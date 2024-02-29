@@ -249,6 +249,44 @@ export default function CustomerOutStanding({
 
         return formattedAmount;
     }
+
+    const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
+    const requestSort = (key) => {
+        let direction = "asc";
+        if (sortConfig.key === key && sortConfig.direction === "asc") {
+          direction = "desc";
+        }
+        setSortConfig({ key, direction });
+      };
+      
+      
+      
+      
+      const sortedData = () => {
+        const dataCopy = [...filterData];
+      
+        if (sortConfig.key) {
+          dataCopy.sort((a, b) => {
+            let valueA = a[sortConfig.key];
+            let valueB = b[sortConfig.key];
+       
+           
+            if (sortConfig.key === "GrandTotal" || sortConfig.key === "Balance" || sortConfig.key === "duedays" ) {
+              valueA = parseFloat(valueA);
+              valueB = parseFloat(valueB);
+            }
+       
+            if (valueA < valueB) {
+              return sortConfig.direction === "asc" ? -1 : 1;
+            }
+            if (valueA > valueB) {
+              return sortConfig.direction === "asc" ? 1 : -1;
+            }
+            return 0;
+          });
+        }
+        return dataCopy;
+      };
     return (
         <div className='row col-md-12'>
             <div className='mt-3 col-md-6'>
@@ -256,21 +294,21 @@ export default function CustomerOutStanding({
                     <Table className='table-data border' striped>
                         <thead className='tableHeaderBGColor' >
                             <tr>
-                                <th>Type</th>
-                                <th>Inv_No</th>
-                                <th>InvoiceFor</th>
-                                <th style={{ whiteSpace: 'nowrap' }}>Invoice_Date</th>
-                                <th style={{ textAlign: 'right' }}>Total</th>
-                                <th style={{ textAlign: 'right' }}>Balance</th>
-                                <th style={{ textAlign: 'center' }}>Due_Days</th>
-                                <th style={{ textAlign: 'center' }}>Status</th>
+                                <th onClick={() => requestSort("DC_InvType")} >Type</th>
+                                <th  onClick={() => requestSort("Inv_No")}>Inv_No</th>
+                                <th onClick={() => requestSort("InvoiceFor")}>InvoiceFor</th>
+                                <th onClick={() => requestSort("Inv_Date")} style={{ whiteSpace: 'nowrap' }}>Invoice_Date</th>
+                                <th onClick={() => requestSort("GrandTotal")} style={{ textAlign: 'right' }}>Total</th>
+                                <th onClick={() => requestSort("Balance")} style={{ textAlign: 'right' }}>Balance</th>
+                                <th onClick={() => requestSort("duedays")} style={{ textAlign: 'center' }}>Due_Days</th>
+                                <th onClick={() => requestSort("DCStatus")} style={{ textAlign: 'center' }}>Status</th>
 
                             </tr>
                         </thead>
 
                         <tbody className='tablebody'>
 
-                            {filterData.map((item, index) => (
+                            {sortedData().map((item, index) => (
 
                                 <tr onClick={() => handleRowSelect(item.DC_Inv_No)}
                                     key={index}

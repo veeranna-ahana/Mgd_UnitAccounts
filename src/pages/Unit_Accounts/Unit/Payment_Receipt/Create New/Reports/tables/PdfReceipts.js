@@ -258,10 +258,13 @@ export default function PdfReceipts({ data }) {
   useEffect(() => {
     // Function to get and format the current date
     const getCurrentDate = () => {
+      
       const now = new Date();
-      const options = { day: '2-digit', month: '2-digit', year: '2-digit' };
-      const formattedDate = now.toLocaleDateString('en-US', options);
-      setCurrentDate(formattedDate);
+    const options = { day: '2-digit', month: '2-digit', year: '2-digit' };
+    const formattedDate = now.toLocaleDateString('en-US', options);
+    const parts = formattedDate.split('/');
+    const formattedDateInDDMMYY = `${parts[1]}-${parts[0]}-${parts[2]}`;
+    setCurrentDate(formattedDateInDDMMYY);
     };
 
 
