@@ -79,8 +79,7 @@ function App() {
               <Route path="fromHoSync" element={<FromHoSync />} />
               <Route path="HOupdateSync" element={<FromHOUpdate />} />
               <Route path="SyncExport" element={<Sync />} />
-              {/* <Route path="ShowSyncStatus" element={<SyncCall />} /> */}
-              <Route path="ShowSyncStatus" element={<SendMail />} />
+              <Route path="ShowSyncStatus" element={<SyncCall />} />
               {/* <Route path="send" element={<SendMail/>} /> */}
             </Route>
           </Route>
