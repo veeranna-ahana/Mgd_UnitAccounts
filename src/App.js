@@ -49,6 +49,7 @@ function App() {
             <Route path="Setup">
               <Route path="Unitlist" element={<UnitDetails />} />
               <Route path="Taxmaster" element={<TaxMasterCall />} />
+            
             </Route>
 
             <Route path="Unit">
@@ -80,7 +81,7 @@ function App() {
               <Route path="HOupdateSync" element={<FromHOUpdate />} />
               <Route path="SyncExport" element={<Sync />} />
               <Route path="ShowSyncStatus" element={<SyncCall />} />
-              {/* <Route path="send" element={<SendMail/>} /> */}
+               
             </Route>
           </Route>
         </Route>

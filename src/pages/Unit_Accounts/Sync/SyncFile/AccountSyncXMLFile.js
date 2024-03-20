@@ -4,7 +4,11 @@ import { xml2js, js2xml } from "xml-js";
 import { baseURL } from "../../../../api/baseUrl";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-// import SendMail from "../sendMail/SendMail";
+
+
+import MailModal from "../../MailModal";
+import Modal from 'react-bootstrap/Modal';
+import { Button } from 'react-bootstrap';
 
 export default function AccountSyncXMLFile() {
   const [getCustInvoice, setGetCustInvoice] = useState([]);
@@ -14,6 +18,7 @@ export default function AccountSyncXMLFile() {
   const [getPaymentReceipts, setGetPaymentReceipts] = useState([]);
   const [getPaymentAdjusted, setGetPaymentAdjusted] = useState([]);
   const [getCancelledUnit, setGetCancelledUnit] = useState([]);
+  const [mailAlert,setMailAlert]=useState(false)
 
   const navigate = useNavigate();
 
@@ -301,8 +306,10 @@ export default function AccountSyncXMLFile() {
   //     console.error("Error saving file:", error);
   //   }
   // };
+  //  mail related code
+  const [mailModal, setMailModal] = useState(false)
 
-  const handleDownload = () => {
+  const handleDownload =async () => {
     try {
       const xmlString = arrayToXML({
         getCustInvoice,
@@ -316,6 +323,8 @@ export default function AccountSyncXMLFile() {
       const finalXmlString = `<?xml version="1.0" standalone="yes"?>\n${xmlString}`;
       const dataUri =
         "data:text/xml;charset=utf-8," + encodeURIComponent(finalXmlString);
+
+       
 
       const a = document.createElement("a");
       a.href = dataUri;
@@ -336,14 +345,24 @@ export default function AccountSyncXMLFile() {
 
       // Append the anchor to the document, click it, and remove it
       document.body.appendChild(a);
+      
+   
       a.click();
       document.body.removeChild(a);
 
+      
       // Handle the rest of your logic here
     } catch (error) {
       console.error("Error saving file:", error);
     }
+
+    setTimeout(callMailModal, 10000);
   };
+
+
+  const callMailModal=()=>{
+    setMailAlert(true)
+  }
 
   //api for the Accounts Sync
   const handleCustList = () => {
@@ -429,31 +448,105 @@ export default function AccountSyncXMLFile() {
     handleCustList();
   }, []);
 
-  // console.log('custList', getCustInvoice);
-  // console.log('InvoiceList', getInvoiceList);
-  // console.log('InvoiceTaxList', getInvoiceTaxList);
-  // console.log('InvoiceSummary', getInvoiceSummary);
-  // console.log('paymentReceipts', getPaymentReceipts);
-  // console.log('paymentAdjusted', getPaymentAdjusted); //next
-  // console.log('cancelledUnit', getCancelledUnit);
+
+  //  mail related code
+
+
+ 
+
+  // const mailsubmit=()=>{
+  //   setMailAlert(true);
+  // }
+  // const handleClose=()=>{
+  //   setMailAlert(false);
+  // }
+
+
+  const yesmailSubmit=()=>{
+    setMailAlert(false);
+    setMailModal(true);
+  }
+  const [mailData, setMailData] = useState({
+    mbody: "",
+    msubjct: ""
+  });
+
+ 
+  const handleClose = () => {
+    setMailModal(false);
+    setMailAlert(false)
+  }
+
+
+  let fstbtnc = () => {
+   
+    // let newDate = moment(new Date()).format("DD MMM YY");
+    let newDate = '23-02-2024'
+    let msubjct = Buffer.from(
+      `Magod Laser Payment Balance Statement ${newDate}`
+    ).toString("base64");
+    let mbody = Buffer.from(
+      `Dear Sir,\n
+
+        The details of outstanding invoice that are overdue for payment as of date is attached. Total out standing amount as per our records is Rs. 123 /- and total amount over due for payment is Rs. 999 /-. We request you to release the payment that is due at the earliest. 
+
+        Looking forward to receiving payment at the earliest. We assure you best of service in quality and timely delivery
+        
+        
+        With warm regards\n
+        
+        Yours Sincerely\n
+        
+        Magod Laser Machining Pvt Ltd :\n
+        Unit: Jigani`
+    ).toString("base64");
+   
+    setMailData({ mbody, msubjct });
+    
+  };
 
   return (
     <>
+<Modal 
+ show={mailAlert} 
+ onHide={handleClose}
+>
+        <Modal.Header closeButton>
+          <Modal.Title>magod_machine</Modal.Title>
+        </Modal.Header>
+
+        <Modal.Body> Accounts Sync Report Saved as (path filename.xml) Do you wish to mail it? 
+           
+
+         </Modal.Body> 
+
+        <Modal.Footer>
+        <Button variant="primary" onClick={yesmailSubmit}
+          >
+            Yes
+          </Button>
+          <Button variant="secondary" onClick={handleClose}>
+            No
+          </Button>
+         
+        </Modal.Footer>
+      </Modal>
       <div className="col-md-12">
+
         <div className="row">
           <h4 className="title">From Accounts Sync File</h4>
         </div>
       </div>
       <div className="d-flex col-md-12">
         <div className="">
-        <button
-          className="button-style mt-2 group-button"
-          onClick={handleDownload}
-        >
-          Account Sync File
-        </button>
+          <button
+            className="button-style mt-2 group-button"
+            onClick={handleDownload}
+          >
+            Account Sync File
+          </button>
         </div>
-        <div className="" style={{marginLeft:'70%'}}>
+        <div className="" style={{ marginLeft: '70%' }}>
           <button
             className="button-style mt-2 group-button"
             type="button"
@@ -463,6 +556,9 @@ export default function AccountSyncXMLFile() {
           </button>
         </div>
       </div>
+      {mailModal &&
+        <MailModal mailModal={mailModal} setMailModal={setMailModal} />
+      }
     </>
   );
 }
