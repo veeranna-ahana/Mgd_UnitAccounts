@@ -2,10 +2,12 @@ import React, { useEffect, useRef, useState } from "react";
 import { Table } from "react-bootstrap";
 // import UnitDetailsForm from "./UnitDetailsForm";
 import { useNavigate } from 'react-router-dom';
+import Modal from 'react-bootstrap/Modal';
+import { Button } from 'react-bootstrap';
 
 import axios from "axios";
 
-
+import { Buffer } from "buffer";
 // Import toastify css file
 import 'react-toastify/dist/ReactToastify.css';
 import { baseURL } from "../../../../api/baseUrl";
@@ -42,12 +44,7 @@ export default function UnitDetails() {
   //  const [postState, setPostState] = useState(initial_state);
 
   useEffect(() => {
-    // async function fetchData() {
-
-    //   await UnitGetDta();
-    // }
-    // fetchData()
-    // getStateList();
+    
     UnitGetDta()
 
 
@@ -160,8 +157,18 @@ export default function UnitDetails() {
     return dataCopy;
   };
 
+
+  //send mail integration
+  
+
+  
+
+
+ 
   return (
     <>
+
+
 
 
 
@@ -180,7 +187,9 @@ export default function UnitDetails() {
 
           <button
             className="button-style  group-button"
-            onClick={e => navigate("/UnitAccounts")}
+             onClick={e => navigate("/UnitAccounts")}
+            
+           
             style={{ width: "120px", marginLeft: '200px' }}
           >
             Close
@@ -216,10 +225,7 @@ export default function UnitDetails() {
                 <th
                   onClick={() => requestSort("UnitName")}
                 >Unit Name</th>
-                {/* <th>Unit_Address</th>
-                  <th>Place</th>
-                  <th>State</th>
-                  <th>Country</th> */}
+                
 
 
               </tr>

@@ -55,8 +55,8 @@ const SidebarComp = () => {
 
   useEffect(() => {
     function filterSidebarData(data, accessPaths) {
-      console.log("first", data);
-      console.log("second", accessPaths);
+    //  console.log("first", data);
+   //   console.log("second", accessPaths);
       const filterSidebar = [];
       let previousMenu = null;
 

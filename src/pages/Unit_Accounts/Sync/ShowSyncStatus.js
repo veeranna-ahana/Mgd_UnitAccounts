@@ -10,6 +10,10 @@ import InvoiceTable1 from "./InvoiceTab/InvoiceTable1";
 import { toast } from "react-toastify";
 import { xml2js, js2xml } from "xml-js";
 
+import Modal from 'react-bootstrap/Modal';
+import { Button } from 'react-bootstrap';
+import MailModal from "../MailModal";
+
 export default function ShowSyncStatus() {
   const version = "Unit";
   const navigate = useNavigate();
@@ -32,6 +36,9 @@ export default function ShowSyncStatus() {
   const [openVoucher, setOpenVoucher] = useState([]);
   const [unmatchedCount, setUnmatchedCount] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  const [mailAlert,setMailAlert]=useState(false)
+  const [mailModal, setMailModal] = useState(false)
 
   const arrayToXML = (data) => {
     const openInvoicesData = data.unitOpenInvoices || [];
@@ -202,6 +209,8 @@ export default function ShowSyncStatus() {
     } catch (error) {
       console.error("Error saving file:", error);
     }
+
+    setTimeout(callMailModal, 10000);
   };
   
 
@@ -543,8 +552,45 @@ export default function ShowSyncStatus() {
   console.log("Unit open", openVoucher, "And", unitOpenInvoices);
   // console.log('color', selectedRowColor);
 
+  const handleClose = () => {
+    setMailModal(false);
+    setMailAlert(false)
+  }
+  const yesmailSubmit=()=>{
+    setMailAlert(false);
+    setMailModal(true);
+  }
+
+  const callMailModal=()=>{
+    setMailAlert(true)
+  }
+
   return (
     <div>
+    <Modal 
+ show={mailAlert} 
+ onHide={handleClose}
+>
+        <Modal.Header closeButton>
+          <Modal.Title>magod_machine</Modal.Title>
+        </Modal.Header>
+
+        <Modal.Body> Accounts Sync Report Saved as (path filename.xml) Do you wish to mail it? 
+           
+
+         </Modal.Body> 
+
+        <Modal.Footer>
+        <Button variant="primary" onClick={yesmailSubmit}
+          >
+            Yes
+          </Button>
+          <Button variant="secondary" onClick={handleClose}>
+            No
+          </Button>
+         
+        </Modal.Footer>
+      </Modal>
       <div className="col-md-12">
         <div className="row">
           <h4 className="title">HO Unit Sync Review</h4>
@@ -952,6 +998,9 @@ export default function ShowSyncStatus() {
           </Tabs>
         </div>
       </div>
+      {
+        <MailModal mailModal={mailModal} setMailModal={setMailModal}/>
+      }
     </div>
   );
 }
